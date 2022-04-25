@@ -1,6 +1,6 @@
 {
   "name": "@mobileleaplabs/drivers",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Drivers used to power up services",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
