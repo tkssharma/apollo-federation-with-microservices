@@ -8,7 +8,7 @@
     "bootstrap:ci": "lerna exec npm ci -- --ignore-scripts",
     "build": "lerna run build",
     "clean": "lerna run clean",
-    "lint": "eslint . --ext .ts --fix --quiet",
+    "lint": "node node_modules/.bin/prettier --check \"**/*.{js,json,ts,yml,yaml}\"",
     "prepare": "husky install",
     "prepublishOnly": "npm run build",
     "prettier": "node node_modules/.bin/prettier --check \"**/*.{js,json,ts,yml,yaml}\"",
