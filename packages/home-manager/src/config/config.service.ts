@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { urlJoin } from 'url-join-ts';
 import { DEFAULT_CONFIG } from './config.default';
+import { AwsS3Config } from './config.interface';
 
 import {
   AzureConfig,
@@ -8,9 +9,7 @@ import {
   ConfigData,
   ConfigDBData,
   PlatformAPIs,
-  SwaggerUserConfig,
-  KafkaConfig,
-  HelloSignConfig,
+  SwaggerUserConfig
 } from './config.interface';
 
 /**
@@ -40,6 +39,7 @@ export class ConfigService {
       auth: this.parseAuthConfigFromEnv(env),
       swagger: this.parseSwaggerConfigFromEnv(env, DEFAULT_CONFIG.swagger),
       platformApis: this.parseNotificationsConfigFromEnv(env),
+      aws: this.parseAWSConfigFromEnv(env, DEFAULT_CONFIG.aws),
     };
   }
 
@@ -58,6 +58,14 @@ export class ConfigService {
     return {
       username: env.SWAGGER_USERNAME || defaultConfig.username,
       password: env.SWAGGER_PASSWORD || defaultConfig.password,
+    };
+  }
+  private parseAWSConfigFromEnv(
+    env: NodeJS.ProcessEnv,
+    defaultConfig: Readonly<AwsS3Config>
+  ): AwsS3Config {
+    return {
+      bucketName: env.AWS_S3_BUCKET_NAME || defaultConfig.bucketName,
     };
   }
   private parseDbConfigFromEnv(

@@ -54,9 +54,8 @@ export interface Notifications {
   token: string;
 }
 
-export interface HelloSignConfig {
-  helloSignAPIKey?: string;
-  helloSignClientToken?: string;
+export interface AwsS3Config {
+  bucketName: string;
 }
 
 /**
@@ -72,6 +71,8 @@ export interface ConfigData {
   port: number;
 
   auth: ConfigAuthData;
+
+  aws: AwsS3Config;
 
   /** Database connection details. */
   db: ConfigDBData;

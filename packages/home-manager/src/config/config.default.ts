@@ -12,6 +12,9 @@ export const DEFAULT_CONFIG: ConfigData = {
     username: '',
     password: '',
   },
+  aws: {
+    bucketName: ''
+  },
   platformApis: {
     baseUrl: '',
     token: '',
