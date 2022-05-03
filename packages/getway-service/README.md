@@ -1,11 +1,22 @@
-# `getway-service`
+## Description
 
-> TODO: description
+Federation server for both department and user microservice
 
-## Usage
+## Installation
 
+```bash
+$ npm install
 ```
-const getwayService = require('getway-service');
 
-// TODO: DEMONSTRATE API
+## Running the app
+
+```bash
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
 ```

@@ -1,0 +1,45 @@
+scalar Date
+scalar ObjectId
+
+type Query {
+  users: [User!]!
+  user(username: String, email: String): User!
+  forgotPassword(email: String): Boolean
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput): User!
+  updateUser(fieldsToUpdate: UpdateUserInput!, username: String): User!
+  addAdminPermission(username: String!): User!
+  removeAdminPermission(username: String!): User!
+  resetPassword(username: String!, code: String!, password: String!): User!
+}
+
+type User {
+  username: String!
+  email: String!
+  permissions: [String!]!
+  createdAt: Date!
+  updatedAt: Date!
+  lastSeenAt: Date!
+  enabled: Boolean!
+  _id: ObjectId!
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  username: String
+  email: String
+  password: UpdatePasswordInput
+  enabled: Boolean
+}
+
+input UpdatePasswordInput {
+  oldPassword: String!
+  newPassword: String!
+}
