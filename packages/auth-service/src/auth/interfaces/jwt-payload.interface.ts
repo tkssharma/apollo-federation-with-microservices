@@ -1,5 +1,6 @@
 export interface JwtPayload {
-  email: string;
+  userId: string;
   username: string;
+  permissions: string[]
   expiration?: Date;
 }

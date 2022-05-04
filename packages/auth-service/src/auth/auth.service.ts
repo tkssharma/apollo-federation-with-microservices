@@ -104,8 +104,9 @@ export class AuthService {
       expiration.setTime(expiration.getTime() + expiresIn * 1000);
     }
     const data: JwtPayload = {
-      email: user.email,
+      userId: user._id,
       username: user.username,
+      permissions: user.permissions,
       expiration,
     };
 
