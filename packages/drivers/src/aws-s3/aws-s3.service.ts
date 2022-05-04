@@ -1,29 +1,36 @@
 // Package.
-import { S3, config } from "aws-sdk";
-import { Injectable } from "@nestjs/common";
-import moment from "moment";
-import { ConfigService } from "@config/config.service";
-
+import { Inject } from "@nestjs/common";
+import { S3 } from "aws-sdk";
+import * as moment from "moment";
 // Internal.
+import { S3_CLIENT_MODULE_OPTIONS } from "./aws-s3.constants";
+import { S3ClientModuleOptions } from "./aws-s3.interface";
 
-// Code.
-@Injectable()
-export default class AWSS3Service {
+export class S3ClientService {
+  private readonly accessKeyId: string = "";
+  private readonly secretAccessKey: string = "";
+  private readonly bucketName: string = "";
   private client: AWS.S3;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    @Inject(S3_CLIENT_MODULE_OPTIONS)
+    private readonly options: S3ClientModuleOptions
+  ) {
+    this.accessKeyId = this.options.accessKeyId;
+    this.secretAccessKey = this.options.secretAccessKey;
+    this.bucketName = this.options.bucketName;
     this.client = new S3({
       region: "eu-central-1",
       credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS!,
+        accessKeyId: this.accessKeyId,
+        secretAccessKey: this.secretAccessKey!,
       },
     });
   }
 
   async upload(file: any, key: string, originalname: string) {
     const params = {
-      Bucket: this.configService.aws.s3MediumBucket,
+      Bucket: this.bucketName,
       Key: key,
       Body: file,
     };
@@ -42,9 +49,8 @@ export default class AWSS3Service {
   }
 
   async getPresignedUrl(key: string, originalname: string) {
-    // TODO: ideally the bucket must be parametrized here
     const params = {
-      Bucket: this.configService.aws.s3MediumBucket,
+      Bucket: this.bucketName,
       Key: key,
       Expires: 60 * 60 * 24 * 7,
       ResponseContentDisposition:

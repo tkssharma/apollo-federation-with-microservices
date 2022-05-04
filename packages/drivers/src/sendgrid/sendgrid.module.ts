@@ -1,25 +1,89 @@
 // Package.
-import { Global, Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { SendGridModule } from "@ntegral/nestjs-sendgrid";
+import { DynamicModule, Global, Module, Provider, Type } from "@nestjs/common";
 
-// Internal.
-import { SendgridService } from "./sendgrid.service";
+//Internal
+import {
+  SENDGRID_CLIENT_TOKEN,
+  SENDGRID_CLIENT_MODULE_OPTIONS,
+} from "./sendgrid.constants";
+import {
+  SendgridClientModuleOptions,
+  SendgridClientModuleAsyncOptions,
+  SendgridClientModuleFactory,
+} from "./sendgrid.interface";
+import { createSendgridClientProvider } from "./sendgrid.provider";
+import { getSendgridClientModuleOptions } from "./utils";
 
-// Code.
-
+//Code.
 @Global()
-@Module({
-  imports: [
-    SendGridModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        apiKey: config.get("SENDGRID_ACCESS_KEY") || "",
-      }),
-    }),
-  ],
-  providers: [SendgridService],
-  exports: [SendgridService],
-})
-export class SendgridModule {}
+@Module({})
+export class SendgridClientModule {
+  public static forRoot(options: SendgridClientModuleOptions): DynamicModule {
+    const provider: Provider = createSendgridClientProvider(options);
+    return {
+      module: SendgridClientModule,
+      providers: [provider],
+      exports: [provider],
+    };
+  }
+
+  public static forRootAsync(
+    options: SendgridClientModuleAsyncOptions
+  ): DynamicModule {
+    const provider: Provider = {
+      inject: [SENDGRID_CLIENT_MODULE_OPTIONS],
+      provide: SENDGRID_CLIENT_TOKEN,
+      useFactory: async (options: SendgridClientModuleOptions) =>
+        getSendgridClientModuleOptions(options),
+    };
+
+    return {
+      module: SendgridClientModule,
+      imports: options.imports,
+      providers: [...this.createAsyncProviders(options), provider],
+      exports: [provider],
+    };
+  }
+
+  private static createAsyncProviders(
+    options: SendgridClientModuleAsyncOptions
+  ): Provider[] {
+    if (options.useExisting || options.useFactory) {
+      return [this.createAsyncOptionsProvider(options)];
+    }
+
+    const useClass = options.useClass as Type<SendgridClientModuleFactory>;
+
+    return [
+      this.createAsyncOptionsProvider(options),
+      {
+        provide: useClass,
+        useClass,
+      },
+    ];
+  }
+
+  private static createAsyncOptionsProvider(
+    options: SendgridClientModuleAsyncOptions
+  ): Provider {
+    if (options.useFactory) {
+      return {
+        provide: SENDGRID_CLIENT_MODULE_OPTIONS,
+        useFactory: options.useFactory,
+        inject: options.inject || [],
+      };
+    }
+
+    const inject = [
+      (options.useClass ||
+        options.useExisting) as Type<SendgridClientModuleFactory>,
+    ];
+
+    return {
+      provide: SENDGRID_CLIENT_MODULE_OPTIONS,
+      useFactory: async (optionsFactory: SendgridClientModuleFactory) =>
+        await optionsFactory.createPlatformModuleOptions(),
+      inject,
+    };
+  }
+}

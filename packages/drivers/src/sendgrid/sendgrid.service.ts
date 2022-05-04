@@ -1,49 +1,45 @@
 // Package.
-import { Injectable } from "@nestjs/common";
-import { InjectSendGrid, SendGridService } from "@ntegral/nestjs-sendgrid";
-import { ClientResponse } from "@sendgrid/client/src/response";
-
+import { Inject } from "@nestjs/common";
 // Internal.
-import {
-  IEmailProvider,
-  SendBatchEmailInput,
-  SendEmailInput,
-} from "../email-provider";
+import { SENDGRID_CLIENT_MODULE_OPTIONS } from "./sendgrid.constants";
+import { SendgridClientModuleOptions } from "./sendgrid.interface";
+const sendGridClient = require("@sendgrid/mail");
+export interface MessagePayload {
+  to: string;
+  from: string;
+}
+export interface MessageWithTemplate {
+  recipient: string;
+  templateId: string;
+}
+export class SendgridClientService {
+  private readonly sendgrid_token: string = "";
 
-// Code.
-@Injectable()
-export class SendgridService implements IEmailProvider {
-  constructor(@InjectSendGrid() private readonly sendgrid: SendGridService) {}
-
-  async sendBatchEmail(input: SendBatchEmailInput): Promise<ClientResponse> {
-    if (!input.text && !input.html) {
-      throw new Error("Message body cannot be empty");
-    }
-
-    const [res] = await this.sendgrid.sendMultiple({
-      from: input.from,
-      to: input.to,
-      subject: input.subject,
-      text: input.text,
-      html: input.html,
-    });
-
-    return res;
+  constructor(
+    @Inject(SENDGRID_CLIENT_MODULE_OPTIONS)
+    private readonly options: SendgridClientModuleOptions
+  ) {
+    this.sendgrid_token = this.options.sendgrid_token;
+    sendGridClient.setApiKey(this.sendgrid_token);
   }
-
-  async sendEmail(input: SendEmailInput): Promise<ClientResponse> {
-    if (!input.text && !input.html) {
-      throw new Error("Message body cannot be empty");
+  async sendEmail(message: MessagePayload) {
+    try {
+      await sendGridClient.send(message);
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-
-    const [res] = await this.sendgrid.send({
-      from: input.from,
-      to: input.to,
-      subject: input.subject,
-      text: input.text,
-      html: input.html,
-    });
-
-    return res;
+  }
+  async sendEmailWithTemplate(data: MessageWithTemplate, templateData: any) {
+    try {
+      await sendGridClient.sendMail({
+        recipients: [data.recipient],
+        templateId: data.templateId,
+        templateData,
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 }
