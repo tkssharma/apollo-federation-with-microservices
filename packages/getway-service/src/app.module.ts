@@ -12,10 +12,13 @@ import { GraphQLGatewayModule } from '@nestjs/graphql';
       },
       gateway: {
         serviceList: [
+          // list of services
           { name: 'User', url: 'http://127.0.0.1:3000/graphql-federated' },
+          { name: 'Pokemon', url: 'http://127.0.0.1:3001/graphql-federated' },
+
         ],
       },
     }),
   ],
 })
-export class AppModule {}
+export class AppModule { }

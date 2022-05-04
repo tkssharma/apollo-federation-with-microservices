@@ -1,0 +1,20 @@
+type Pokemon {
+    id: String!
+    name:String!
+    type: String!
+}
+
+type Query {
+    pokemons: [Pokemon!]
+    pokemon(id: ID): Pokemon!
+}
+
+type Deleted {
+    delete: Boolean!
+}
+
+type Mutation {
+    create(name: String!, type: String!): Pokemon
+    update(id: ID!, name: String!, type: String!): Pokemon
+    delete(id: ID!): Deleted
+}
