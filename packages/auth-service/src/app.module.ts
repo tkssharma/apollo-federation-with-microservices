@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
@@ -7,6 +7,8 @@ import { join } from 'path';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { GraphQLFederationModule } from '@nestjs/graphql';
+import { LoggerModule } from './logger';
+import LogsMiddleware from './shared/middleware/log.middleware';
 
 @Module({
   imports: [
@@ -14,7 +16,7 @@ import { GraphQLFederationModule } from '@nestjs/graphql';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const options: MongooseModuleOptions = {
-          uri: configService.mongoUri
+          uri: configService.get().db.url
         };
 
         /*if (configService.mongoAuthEnabled) {
@@ -44,6 +46,13 @@ import { GraphQLFederationModule } from '@nestjs/graphql';
     UsersModule,
     AuthModule,
     ConfigModule,
+    LoggerModule
   ],
 })
-export class AppModule { }
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LogsMiddleware)
+      .forRoutes('*');
+  }
+}

@@ -1,13 +1,19 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from './config.service';
 
+const configFactory = {
+  provide: ConfigService,
+  useFactory: () => {
+    const config = new ConfigService();
+    config.loadFromEnv();
+    return config;
+  },
+};
+
 @Module({
-  providers: [
-    {
-      provide: ConfigService,
-      useValue: new ConfigService(`${process.env.NODE_ENV}.env`),
-    },
-  ],
-  exports: [ConfigService],
+  imports: [],
+  controllers: [],
+  providers: [configFactory],
+  exports: [configFactory],
 })
 export class ConfigModule {}

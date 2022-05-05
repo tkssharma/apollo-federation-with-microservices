@@ -15,7 +15,7 @@ export class UsersService {
     @InjectModel('User') private readonly userModel: Model<UserDocument>,
     private configService: ConfigService,
     private authService: AuthService,
-  ) {}
+  ) { }
 
   /**
    * Returns if the user has 'admin' set on the permissions array
@@ -145,7 +145,6 @@ export class UsersService {
    * @memberof UsersService
    */
   async forgotPassword(email: string): Promise<boolean> {
-    if (!this.configService.emailEnabled) return false;
 
     const user = await this.findOneByEmail(email);
     if (!user) return false;
@@ -156,25 +155,20 @@ export class UsersService {
     // One day for expiration of reset token
     const expiration = new Date(Date().valueOf() + 24 * 60 * 60 * 1000);
 
-    const transporter = createTransport({
-      service: this.configService.emailService,
-      auth: {
-        user: this.configService.emailUsername,
-        pass: this.configService.emailPassword,
-      },
-    });
+    // use send-grid and send email
+    // ! TBD 
 
-    const mailOptions: SendMailOptions = {
-      from: this.configService.emailFrom,
-      to: email,
-      subject: `Reset Password`,
-      text: `${user.username},
-      Replace this with a website that can pass the token:
-      ${token}`,
-    };
+    /* const mailOptions: SendMailOptions = {
+       from: this.configService.emailFrom,
+       to: email,
+       subject: `Reset Password`,
+       text: `${user.username},
+       Replace this with a website that can pass the token:
+       ${token}`,
+     }; */
 
     return new Promise(resolve => {
-      transporter.sendMail(mailOptions, (err, info) => {
+      /*transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
           resolve(false);
           return;
@@ -189,7 +183,7 @@ export class UsersService {
           () => resolve(true),
           () => resolve(false),
         );
-      });
+      }); */
     });
   }
 

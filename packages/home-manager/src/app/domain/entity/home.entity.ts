@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne } from 'typeorm';
 
-@Entity('pokemon')
-export class PokemonEntity extends BaseEntity {
+@Entity('homes')
+export class HomeEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 

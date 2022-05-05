@@ -25,7 +25,7 @@ export class Logger implements LoggerService {
 
   constructor(private configService: ConfigService) {
     this.logger = winston.createLogger({
-      level: configService.logLevel,
+      level: configService.get().logLevel,
       format: formatter(),
     });
     this.logger.add(new winston.transports.Console({

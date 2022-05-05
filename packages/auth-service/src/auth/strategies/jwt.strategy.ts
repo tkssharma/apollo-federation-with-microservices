@@ -11,7 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService, configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.jwtSecret,
+      secretOrKey: configService.get().auth.jwtSecret,
     });
   }
 
@@ -19,8 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload) {
     // This is called to validate the user in the token exists
     const user = await this.authService.validateJwtPayload(payload);
-    console.log("OKKK")
-    console.log(user);
     if (!user) {
       throw new AuthenticationError(
         'Could ********** not log-in with the provided credentials',

@@ -1,3 +1,4 @@
+import { ConfigDBData } from '@app/config/config.interface';
 import { ConfigModule } from '@app/config/config.module';
 import { ConfigService } from '@app/config/config.service';
 import { DynamicModule, Module } from '@nestjs/common';
@@ -10,7 +11,7 @@ import { DbConfig } from './db.interface';
 @Module({})
 export class DbModule {
   private static getConnectionOptions(config: ConfigService, dbconfig: DbConfig): TypeOrmModuleOptions {
-    const dbdata = config
+    const dbdata = config.get().db;
     if (!dbdata) {
       throw new DbConfigError('Database config is mSissing');
     }
@@ -23,10 +24,10 @@ export class DbModule {
     };
   }
 
-  private static getConnectionOptionsPostgres(dbdata: any): TypeOrmModuleOptions {
+  private static getConnectionOptionsPostgres(dbdata: ConfigDBData): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      url: dbdata.databaseUrl,
+      url: dbdata.url,
       keepConnectionAlive: true,
       ssl: (process.env.NODE_ENV !== 'local' && process.env.NODE_ENV !== 'test')
         ? { rejectUnauthorized: false }

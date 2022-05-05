@@ -7,19 +7,21 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthResolver } from './auth.resolvers';
 import { ConfigService } from '../config/config.service';
 import { ConfigModule } from '../config/config.module';
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
   imports: [
+    LoggerModule,
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         const options: JwtModuleOptions = {
-          secret: configService.jwtSecret,
+          secret: configService.get().auth.jwtSecret,
         };
-        if (configService.jwtExpiresIn) {
+        if (configService.get().auth.expireIn) {
           options.signOptions = {
-            expiresIn: configService.jwtExpiresIn,
+            expiresIn: configService.get().auth.expireIn,
           };
         }
         return options;
@@ -33,4 +35,4 @@ import { ConfigModule } from '../config/config.module';
   providers: [AuthService, AuthResolver, JwtStrategy],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }

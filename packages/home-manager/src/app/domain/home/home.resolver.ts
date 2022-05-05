@@ -1,6 +1,6 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
-import { PokemonEntity } from '../entity/pokemon.entity';
-import { PokemonService } from './pokemon.service';
+import { PokemonEntity } from '../entity/home.entity';
+import { PokemonService } from './home.service';
 
 @Resolver(PokemonEntity)
 export class PokemonResolver {

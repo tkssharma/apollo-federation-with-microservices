@@ -1,125 +1,66 @@
 import { Injectable } from '@nestjs/common';
-import * as dotenv from 'dotenv';
-import * as fs from 'fs';
-import * as Joi from 'joi';
-import { IsEnum, IsNumber, validateSync } from 'class-validator';
+import { urlJoin } from 'url-join-ts';
+import { DEFAULT_CONFIG } from './config.default';
+import { ConfigData, ConfigDBData, SendGridConfig, AuthConfig } from './config.interface';
 
-export interface EnvConfig {
-  [key: string]: string;
-}
 
+/**
+ * Provides a means to access the application configuration.
+ */
 @Injectable()
 export class ConfigService {
-  private readonly envConfig: EnvConfig;
+  private config: ConfigData;
 
-  constructor(filePath: string) {
-    let file: Buffer | undefined;
-    try {
-      file = fs.readFileSync(filePath);
-    } catch (error) {
-      file = fs.readFileSync('.env');
-    }
-
-    const config = dotenv.parse(file);
-    this.envConfig = this.validateInput(config);
+  constructor(data: ConfigData = DEFAULT_CONFIG) {
+    this.config = data;
   }
 
-  private validateInput(envConfig: EnvConfig): EnvConfig {
-    const envVarsSchema: Joi.ObjectSchema = Joi.object({
-      MONGO_URI: Joi.string().required(),
-      MONGO_AUTH_ENABLED: Joi.boolean().default(false),
-      MONGO_USER: Joi.string().when('MONGO_AUTH_ENABLED', {
-        is: true,
-        then: Joi.required(),
-      }),
-      MONGO_PASSWORD: Joi.string().when('MONGO_AUTH_ENABLED', {
-        is: true,
-        then: Joi.required(),
-      }),
-      IMAGES_URL: Joi.string().default('http://localhost:3000/images/'),
-      JWT_SECRET: Joi.string().required(),
-      JWT_EXPIRES_IN: Joi.number(),
-      EMAIL_ENABLED: Joi.boolean().default(false),
-      EMAIL_SERVICE: Joi.string().when('EMAIL_ENABLED', {
-        is: true,
-        then: Joi.required(),
-      }),
-      EMAIL_USERNAME: Joi.string().when('EMAIL_ENABLED', {
-        is: true,
-        then: Joi.required(),
-      }),
-      EMAIL_PASSWORD: Joi.string().when('EMAIL_ENABLED', {
-        is: true,
-        then: Joi.required(),
-      }),
-      EMAIL_FROM: Joi.string().when('EMAIL_ENABLED', {
-        is: true,
-        then: Joi.required(),
-      }),
-      TEST_EMAIL_TO: Joi.string(),
-    });
-
-
-    const { error, value: validatedEnvConfig } = Joi.validate(envConfig, envVarsSchema);
-    if (error) {
-      throw new Error(`Config validation error in your env file: ${error.message}`);
-    }
-    return validatedEnvConfig;
-
+  /**
+   * Loads the config from environment variables.
+   */
+  public loadFromEnv() {
+    this.config = this.parseConfigFromEnv(process.env);
   }
 
-  get jwtExpiresIn(): number | undefined {
-    if (this.envConfig.JWT_EXPIRES_IN) {
-      return +this.envConfig.JWT_EXPIRES_IN;
-    }
-    return undefined;
+  private parseConfigFromEnv(env: NodeJS.ProcessEnv): ConfigData {
+    return {
+      env: env.NODE_ENV || DEFAULT_CONFIG.env,
+      port: parseInt(env.PORT!, 10),
+      db: this.parseDbConfigFromEnv(env, DEFAULT_CONFIG.db),
+      logLevel: env.LOG_LEVEL || DEFAULT_CONFIG.logLevel,
+      debug: env.DEBUG || 'qapi:*',
+      newRelicKey: env.NEW_RELIC_KEY || DEFAULT_CONFIG.newRelicKey,
+      sendGrid: this.parseSendGridConfigFromEnv(env),
+      auth: this.parseAuthConfigFromEnv(env)
+    };
   }
 
-  get mongoUri(): string {
-    return this.envConfig.MONGO_URI;
+  private parseAuthConfigFromEnv(env: NodeJS.ProcessEnv): AuthConfig {
+    return {
+      jwtSecret: env.JWT_SECRET || '',
+      expireIn: Number(env.JWT_EXPIRE_IN) || 268000
+    };
+  }
+  private parseSendGridConfigFromEnv(env: NodeJS.ProcessEnv): SendGridConfig {
+    return {
+      apiKey: env.SENDGRID_API_KEY || '',
+      verifiedEmail: env.SENDGRID_VERIFIED_SENDER_EMAIL || ''
+    };
   }
 
-  get jwtSecret(): string {
-    return this.envConfig.JWT_SECRET;
+
+  private parseDbConfigFromEnv(env: NodeJS.ProcessEnv, defaultConfig: Readonly<ConfigDBData>): ConfigDBData {
+    return {
+      url: env.DATABASE_URL || defaultConfig.url,
+    };
   }
 
-  get imagesUrl(): string {
-    return this.envConfig.IMAGES_URL;
-  }
 
-  get emailService(): string | undefined {
-    return this.envConfig.EMAIL_SERVICE;
-  }
-
-  get emailUsername(): string | undefined {
-    return this.envConfig.EMAIL_USERNAME;
-  }
-
-  get emailPassword(): string | undefined {
-    return this.envConfig.EMAIL_PASSWORD;
-  }
-
-  get emailFrom(): string | undefined {
-    return this.envConfig.EMAIL_FROM;
-  }
-
-  get testEmailTo(): string | undefined {
-    return this.envConfig.TEST_EMAIL_TO;
-  }
-
-  get mongoUser(): string | undefined {
-    return this.envConfig.MONGO_USER;
-  }
-
-  get mongoPassword(): string | undefined {
-    return this.envConfig.MONGO_PASSWORD;
-  }
-
-  get emailEnabled(): boolean {
-    return Boolean(this.envConfig.EMAIL_ENABLED).valueOf();
-  }
-
-  get mongoAuthEnabled(): boolean {
-    return Boolean(this.envConfig.MONGO_AUTH_ENABLED).valueOf();
+  /**
+   * Retrieves the config.
+   * @returns immutable view of the config data
+   */
+  public get(): Readonly<ConfigData> {
+    return this.config;
   }
 }

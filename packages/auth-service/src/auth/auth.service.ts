@@ -7,9 +7,11 @@ import { UserDocument } from '../users/schemas/user.schema';
 import { ConfigService } from '../config/config.service';
 import { resolve } from 'path';
 import { Console } from 'console';
+import { Logger } from '../logger';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger("AuthResolver");
   constructor(
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
@@ -29,13 +31,14 @@ export class AuthService {
     loginAttempt: LoginUserInput,
   ): Promise<LoginResult | undefined> {
     console.log(loginAttempt)
+    console.log(this.logger.debug('?'))
+
     // This will be used for the initial login
     let userToAttempt: UserDocument | undefined;
     if (loginAttempt.email) {
       userToAttempt = await this.usersService.findOneByEmail(
         loginAttempt.email,
       );
-      console.log(userToAttempt);
 
     }
 
@@ -48,7 +51,6 @@ export class AuthService {
       console.log(error);
       return undefined;
     }
-    console.log(loginAttempt, isMatch)
 
     if (isMatch) {
       // If there is a successful match, generate a JWT for the user
@@ -97,7 +99,7 @@ export class AuthService {
    * @memberof AuthService
    */
   createJwt(user: User): { data: JwtPayload; token: string } {
-    const expiresIn = this.configService.jwtExpiresIn;
+    const expiresIn = this.configService.get().auth.expireIn as number;
     let expiration: Date | undefined;
     if (expiresIn) {
       expiration = new Date();

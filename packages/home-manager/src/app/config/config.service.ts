@@ -1,39 +1,58 @@
-import { Injectable, LogLevel } from '@nestjs/common';
-import * as dotenv from 'dotenv';
-import * as fs from 'fs';
-import * as Joi from 'joi';
-import { IsEnum, IsNumber, validateSync } from 'class-validator';
+import { Injectable } from '@nestjs/common';
+import { urlJoin } from 'url-join-ts';
+import { DEFAULT_CONFIG } from './config.default';
+import { ConfigData, ConfigDBData, SendGridConfig } from './config.interface';
 
-export interface EnvConfig {
-  [key: string]: string;
-}
 
+/**
+ * Provides a means to access the application configuration.
+ */
 @Injectable()
 export class ConfigService {
-  private readonly envConfig: EnvConfig;
+  private config: ConfigData;
 
-  constructor(filePath: string) {
-    let file: Buffer | undefined;
-    try {
-      file = fs.readFileSync(filePath);
-    } catch (error) {
-      file = fs.readFileSync('.env');
-    }
-
-    const config = dotenv.parse(file);
-    this.envConfig = config;
+  constructor(data: ConfigData = DEFAULT_CONFIG) {
+    this.config = data;
   }
 
-  get databaseUrl(): string {
-    return this.envConfig.DATABASE_URL
+  /**
+   * Loads the config from environment variables.
+   */
+  public loadFromEnv() {
+    this.config = this.parseConfigFromEnv(process.env);
   }
-  get port(): number {
-    return Number(this.envConfig.PORT)
+
+  private parseConfigFromEnv(env: NodeJS.ProcessEnv): ConfigData {
+    return {
+      env: env.NODE_ENV || DEFAULT_CONFIG.env,
+      port: parseInt(env.PORT!, 10),
+      db: this.parseDbConfigFromEnv(env, DEFAULT_CONFIG.db),
+      logLevel: env.LOG_LEVEL || DEFAULT_CONFIG.logLevel,
+      newRelicKey: env.NEW_RELIC_KEY || DEFAULT_CONFIG.newRelicKey,
+      sendGrid: this.parseSendGridConfigFromEnv(env),
+    };
   }
-  get env(): string {
-    return this.envConfig.NODE_ENV;
+
+  private parseSendGridConfigFromEnv(env: NodeJS.ProcessEnv): SendGridConfig {
+    return {
+      apiKey: env.SENDGRID_API_KEY || '',
+      verifiedEmail: env.SENDGRID_VERIFIED_SENDER_EMAIL || ''
+    };
   }
-  get logLevel(): string {
-    return this.envConfig.LOG_LEVEL
+
+
+  private parseDbConfigFromEnv(env: NodeJS.ProcessEnv, defaultConfig: Readonly<ConfigDBData>): ConfigDBData {
+    return {
+      url: env.DATABASE_URL || defaultConfig.url,
+    };
+  }
+
+
+  /**
+   * Retrieves the config.
+   * @returns immutable view of the config data
+   */
+  public get(): Readonly<ConfigData> {
+    return this.config;
   }
 }

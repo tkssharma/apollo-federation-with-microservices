@@ -166,7 +166,6 @@ UserSchema.methods.checkPassword = function (
 ): Promise<boolean> {
   const user = this;
   return new Promise((resolve, reject) => {
-    console.log(password, user.password)
     bcrypt.compare(password, user.password, (error, isMatch) => {
       console.log(isMatch);
       if (error) {
