@@ -1,20 +1,19 @@
+import { ConfigDBData } from '@app/config/config.interface';
+import { ConfigModule } from '@app/config/config.module';
+import { ConfigService } from '@app/config/config.service';
 import { DynamicModule, Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-import { ConfigDBData } from '../config/config.interface';
-import { ConfigModule } from '../config/config.module';
-import { ConfigService } from '../config/config.service';
 import { Logger } from '../logger/logger';
 import { AppLoggerModule } from '../logger/logger.module';
 import { DbConfigError } from './db.errors';
 import { DbConfig } from './db.interface';
-import { DatabaseService } from './db.service';
 @Module({})
 export class DbModule {
   private static getConnectionOptions(config: ConfigService, dbconfig: DbConfig): TypeOrmModuleOptions {
     const dbdata = config.get().db;
     if (!dbdata) {
-      throw new DbConfigError('Database config is missing');
+      throw new DbConfigError('Database config is mSissing');
     }
     const connectionOptions = DbModule.getConnectionOptionsPostgres(dbdata);
     return {
@@ -48,8 +47,8 @@ export class DbModule {
         }),
       ],
       controllers: [],
-      providers: [DatabaseService],
-      exports: [DatabaseService],
+      providers: [],
+      exports: [],
     };
   }
 }

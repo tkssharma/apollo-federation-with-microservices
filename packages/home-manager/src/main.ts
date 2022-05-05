@@ -7,8 +7,7 @@ import * as helmet from 'helmet';
 import { AppModule } from './app/app.module';
 import { HttpExceptionFilter } from './app/core/interceptor/app.interceptor';
 import { Logger } from './logger/logger';
-import { createDocument } from './swagger/swagger';
-const LISTEN_PORT = 3000;
+const LISTEN_PORT = 3005;
 
 
 const NEST_LOGGING = true;
@@ -26,7 +25,6 @@ async function bootstrap() {
   app.use(helmet.noSniff());
   app.use(helmet.hidePoweredBy());
   app.use(helmet.contentSecurityPolicy());
-  createDocument(app);
   await app.listen(process.env.PORT || LISTEN_PORT);
 }
 bootstrap();

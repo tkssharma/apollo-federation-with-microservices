@@ -1,8 +1,8 @@
+import { ConfigService } from '@app/config/config.service';
 import { Injectable, LoggerService } from '@nestjs/common';
 import * as moment from 'moment';
 import * as winston from 'winston';
 
-import { ConfigService } from '../config/config.service';
 import { isLogLevel, LogLevel } from './loglevel';
 
 const formatter = winston.format((info) => {

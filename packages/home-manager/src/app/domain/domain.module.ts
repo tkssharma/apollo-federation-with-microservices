@@ -1,37 +1,35 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { TerminusModule } from '@nestjs/terminus';
-import { ConfigModule } from '@config/config.module';
-import { DbModule } from '@db/db.module';
-import { HttpClientModule } from '../http/http.module';
-import { AppLoggerModule } from '@logger/logger.module';
-import { AuthModule } from '../auth/auth.module';
-import { AuthMiddleware } from '../auth/middleware/auth-middleware';
-import { HealthController } from '../controllers/app.controller';
-
+import { Module } from '@nestjs/common';
+import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
+import { join } from 'path';
+import { ConfigModule } from '@app/config/config.module';
+import { DbModule } from '../../db/db.module';
+import { HomeEntity } from './entity/home.entity';
+import { GraphQLFederationModule } from '@nestjs/graphql';
+import { HomeModule } from './home/home.module';
 
 @Module({
   imports: [
-    DbModule.forRoot(
-      {
-        entities:
-          []
-      }),
-    EventEmitterModule.forRoot(),
-    HttpClientModule,
+    DbModule.forRoot({
+      entities: [HomeEntity]
+    }),
     ConfigModule,
-    TerminusModule,
-    AppLoggerModule,
-    AuthModule
-  ],
-  controllers: [
-    HealthController,
-  ],
-  providers: [],
-  exports: [],
+    GraphQLModule.forRoot({
+      typePaths: ['./**/*.graphql'],
+      definitions: {
+        path: join(process.cwd(), 'graphql.schama.ts'),
+        outputAs: 'class'
+      }
+    }),
+    GraphQLFederationModule.forRoot({
+      debug: false,
+      path: '/graphql-federated',
+      typePaths: ['./**/*.{graphql,graphql.federation}'],
+    }),
+    HomeModule,
+  ]
 })
-export class DomainModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).exclude('/api/v1/health').forRoutes('*');
-  }
+
+export class DomainModule {
+
 }
