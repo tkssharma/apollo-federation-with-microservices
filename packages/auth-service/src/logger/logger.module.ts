@@ -1,13 +1,20 @@
-// Package.
-import { Global, Module } from "@nestjs/common";
 
-// Internal.
-import { Logger } from "./logger.service";
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '../config/config.module';
 
-// Code.
-@Global()
+import { Logger } from './logger';
+import { LoggerMiddleware } from './logger.middleware';
+
 @Module({
+  imports: [ConfigModule],
+  controllers: [],
   providers: [Logger],
   exports: [Logger],
 })
-export class LoggerModule {}
+export class LoggerModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes('*');
+  }
+}

@@ -7,8 +7,7 @@ import { join } from 'path';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { GraphQLFederationModule } from '@nestjs/graphql';
-import { LoggerModule } from './logger';
-import LogsMiddleware from './shared/middleware/log.middleware';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   imports: [
@@ -50,9 +49,5 @@ import LogsMiddleware from './shared/middleware/log.middleware';
   ],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LogsMiddleware)
-      .forRoutes('*');
-  }
+
 }

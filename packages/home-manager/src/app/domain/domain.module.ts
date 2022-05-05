@@ -6,6 +6,7 @@ import { ConfigModule } from '@app/config/config.module';
 import { DbModule } from '../../db/db.module';
 import { HomeEntity } from './entity/home.entity';
 import { GraphQLFederationModule } from '@nestjs/graphql';
+import { HomeModule } from './home/home.module';
 
 @Module({
   imports: [

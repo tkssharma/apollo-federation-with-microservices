@@ -7,11 +7,9 @@ import { UserDocument } from '../users/schemas/user.schema';
 import { ConfigService } from '../config/config.service';
 import { resolve } from 'path';
 import { Console } from 'console';
-import { Logger } from '../logger';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger("AuthResolver");
   constructor(
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
@@ -31,7 +29,6 @@ export class AuthService {
     loginAttempt: LoginUserInput,
   ): Promise<LoginResult | undefined> {
     console.log(loginAttempt)
-    console.log(this.logger.debug('?'))
 
     // This will be used for the initial login
     let userToAttempt: UserDocument | undefined;

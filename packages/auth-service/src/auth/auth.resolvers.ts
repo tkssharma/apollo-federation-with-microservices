@@ -5,22 +5,15 @@ import { AuthenticationError } from 'apollo-server-core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { UserDocument } from '../users/schemas/user.schema';
-import { Logger } from "../logger";
 
 @Resolver('Auth')
 export class AuthResolver {
-  private readonly logger = new Logger("AuthResolver");
   constructor(private authService: AuthService) { }
 
   @Query('login')
   async login(@Args('user') user: LoginUserInput): Promise<LoginResult> {
     try {
       const result = await this.authService.validateUserByPassword(user);
-      const tag = "[auth-login]";
-      this.logger.verbose(`${tag} input: %j`, { result });
-      this.logger.log(`${tag} input: %j`, { result });
-      this.logger.debug(`${tag} input: %j`, { result });
-      this.logger.verbose(`${tag} input: %j`, { result });
 
       if (result) return result;
       throw new AuthenticationError(
