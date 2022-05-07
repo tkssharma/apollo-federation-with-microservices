@@ -3,8 +3,8 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - development
-      - main
+      - develop
+      - master
 
 jobs:
   publish:
