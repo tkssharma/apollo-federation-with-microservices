@@ -1,5 +1,4 @@
 scalar Date
-scalar ObjectId
 
 type Query {
   users: [User!]!
@@ -19,11 +18,9 @@ type User {
   username: String!
   email: String!
   permissions: [String!]!
-  createdAt: Date!
-  updatedAt: Date!
-  lastSeenAt: Date!
-  enabled: Boolean!
-  _id: ObjectId!
+  created_at: Date!
+  updated_at: Date!
+  id: String!
 }
 
 input CreateUserInput {

@@ -64,12 +64,9 @@ export class User {
     username: string;
     email: string;
     permissions: string[];
-    createdAt: Date;
-    updatedAt: Date;
-    lastSeenAt: Date;
-    enabled: boolean;
-    _id: ObjectId;
+    created_at: Date;
+    updated_at: Date;
+    id: string;
 }
 
-export type ObjectId = any;
 type Nullable<T> = T | null;

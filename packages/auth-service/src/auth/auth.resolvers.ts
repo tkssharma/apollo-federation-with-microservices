@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { AuthenticationError } from 'apollo-server-core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
-import { UserDocument } from '../users/schemas/user.schema';
+import { UserEntity } from '../users/entity/users.entity';
 
 @Resolver('Auth')
 export class AuthResolver {
@@ -29,7 +29,7 @@ export class AuthResolver {
   @Query('refreshToken')
   @UseGuards(JwtAuthGuard)
   async refreshToken(@Context('req') request: any): Promise<string> {
-    const user: UserDocument = request.user;
+    const user: UserEntity = request.user;
     if (!user)
       throw new AuthenticationError(
         'Could not log-in with the provided credentials',

@@ -1,19 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { UserDocument, UserModel } from './schemas/user.schema';
 import { CreateUserInput, UpdateUserInput } from '../graphql.classes';
 import { randomBytes } from 'crypto';
 import { createTransport, SendMailOptions } from 'nodemailer';
 import { ConfigService } from '../config/config.service';
-import { MongoError } from 'mongodb';
 import { AuthService } from '../auth/auth.service';
+import { UserEntity } from './entity/users.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel('User') private readonly userModel: Model<UserDocument>,
-    private configService: ConfigService,
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>, private configService: ConfigService,
     private authService: AuthService,
   ) { }
 
@@ -34,16 +33,16 @@ export class UsersService {
    *
    * @param {string} permission The permission to add to the user
    * @param {string} username The user's username
-   * @returns {(Promise<UserDocument | undefined>)} The user Document with the updated permission. Undefined if the
+   * @returns {(Promise<UserEntity | undefined>)} The user Document with the updated permission. Undefined if the
    * user does not exist
    * @memberof UsersService
    */
   async addPermission(
     permission: string,
     username: string,
-  ): Promise<UserDocument | undefined> {
+  ): Promise<UserEntity | undefined> {
     const user = await this.findOneByUsername(username);
-    if (!user) return undefined;
+    if (!user) return null;
     if (user.permissions.includes(permission)) return user;
     user.permissions.push(permission);
     await user.save();
@@ -55,13 +54,13 @@ export class UsersService {
    *
    * @param {string} permission The permission to remove from the user
    * @param {string} username The username of the user to remove the permission from
-   * @returns {(Promise<UserDocument | undefined>)} Returns undefined if the user does not exist
+   * @returns {(Promise<UserEntity | undefined>)} Returns undefined if the user does not exist
    * @memberof UsersService
    */
   async removePermission(
     permission: string,
     username: string,
-  ): Promise<UserDocument | undefined> {
+  ): Promise<UserEntity | undefined> {
     const user = await this.findOneByUsername(username);
     if (!user) return undefined;
     user.permissions = user.permissions.filter(
@@ -79,13 +78,13 @@ export class UsersService {
    * @param {UpdateUserInput} fieldsToUpdate The user can update their username, email, password, or enabled. If
    * the username is updated, the user's token will no longer work. If the user disables their account, only an admin
    * can reenable it
-   * @returns {(Promise<UserDocument | undefined>)} Returns undefined if the user cannot be found
+   * @returns {(Promise<UserEntity | undefined>)} Returns undefined if the user cannot be found
    * @memberof UsersService
    */
   async update(
     username: string,
     fieldsToUpdate: UpdateUserInput,
-  ): Promise<UserDocument | undefined> {
+  ): Promise<UserEntity | undefined> {
     if (fieldsToUpdate.username) {
       const duplicateUser = await this.findOneByUsername(
         fieldsToUpdate.username,
@@ -95,8 +94,8 @@ export class UsersService {
 
     if (fieldsToUpdate.email) {
       const duplicateUser = await this.findOneByEmail(fieldsToUpdate.email);
-      const emailValid = UserModel.validateEmail(fieldsToUpdate.email);
-      if (duplicateUser || !emailValid) fieldsToUpdate.email = undefined;
+      // const emailValid = UserModel.validateEmail(fieldsToUpdate.email);
+      if (duplicateUser  /* ||!emailValid*/) fieldsToUpdate.email = undefined;
     }
 
     const fields: any = {};
@@ -119,19 +118,21 @@ export class UsersService {
       }
     }
 
-    let user: UserDocument | undefined | null = null;
+    let user: UserEntity | undefined | null = null;
 
     if (Object.entries(fieldsToUpdate).length > 0) {
-      user = await this.userModel.findOneAndUpdate(
-        { lowercaseUsername: username.toLowerCase() },
-        fields,
-        { new: true, runValidators: true },
-      );
-    } else {
-      user = await this.findOneByUsername(username);
+      user = await this.findOneByUsername(username.toLowerCase());
+      if (fields.username) {
+        fields.lowercaseUsername = fields.username.toLowerCase();
+      }
+      if (fields.email) {
+        fields.lowercaseEmail = fields.email.toLowerCase();
+      }
+      const saveEntity = { ...user, ...fields };
+      await this.userRepo.save(saveEntity)
     }
-
-    if (!user) return undefined;
+    user = await this.findOneByUsername(username);
+    if (!user) return null;
 
     return user;
   }
@@ -148,7 +149,6 @@ export class UsersService {
 
     const user = await this.findOneByEmail(email);
     if (!user) return false;
-    if (!user.enabled) return false;
 
     const token = randomBytes(32).toString('hex');
 
@@ -173,17 +173,17 @@ export class UsersService {
           resolve(false);
           return;
         }
-
-        user.passwordReset = {
-          token,
-          expiration,
-        };
-
-        user.save().then(
-          () => resolve(true),
-          () => resolve(false),
-        );
       }); */
+      user.passwordReset = {
+        token,
+        expiration,
+      };
+      user.updated_at = new Date();
+
+      user.save().then(
+        () => resolve(true),
+        () => resolve(false),
+      );
     });
   }
 
@@ -193,24 +193,24 @@ export class UsersService {
    * @param {string} username
    * @param {string} code the token set when the password reset email was sent out
    * @param {string} password the new password the user wants
-   * @returns {(Promise<UserDocument | undefined>)} Returns undefined if the code or the username is wrong
+   * @returns {(Promise<UserEntity | undefined>)} Returns undefined if the code or the username is wrong
    * @memberof UsersService
    */
   async resetPassword(
     username: string,
     code: string,
     password: string,
-  ): Promise<UserDocument | undefined> {
+  ): Promise<UserEntity | undefined> {
     const user = await this.findOneByUsername(username);
-    if (user && user.passwordReset && user.enabled !== false) {
+    if (user && user.passwordReset) {
       if (user.passwordReset.token === code) {
-        user.password = password;
-        user.passwordReset = undefined;
+        user.password = await this.hashPassword(password);
+        user.passwordReset = null;
         await user.save();
         return user;
       }
     }
-    return undefined;
+    return null;
   }
 
   /**
@@ -218,59 +218,75 @@ export class UsersService {
    *
    * @param {CreateUserInput} createUserInput username, email, and password. Username and email must be
    * unique, will throw an email with a description if either are duplicates
-   * @returns {Promise<UserDocument>} or throws an error
+   * @returns {Promise<UserEntity>} or throws an error
    * @memberof UsersService
    */
-  async create(createUserInput: CreateUserInput): Promise<UserDocument> {
-    const createdUser = new this.userModel(createUserInput);
+  async create(createUserInput: CreateUserInput): Promise<UserEntity> {
+    const userEntity = this.userRepo.create();
+    const pass = await this.hashPassword(createUserInput.password);
 
-    let user: UserDocument | undefined;
+    const saveEntity = {
+      ...userEntity,
+      ...createUserInput,
+      password: pass,
+      lowercaseUsername: createUserInput.username.toLowerCase(),
+      lowercaseEmail: createUserInput.email.toLowerCase()
+    };
+
+    let user: UserEntity | null;
     try {
-      user = await createdUser.save();
+      user = await this.userRepo.save(saveEntity);
     } catch (error) {
-      throw this.evaluateMongoError(error, createUserInput);
+      console.log(error)
+      throw this.evaluateDBError(error, createUserInput);
     }
     return user;
+  }
+
+  private async hashPassword(password) {
+    const hash = await bcrypt.hash(password, 10);
+    return hash;
+  }
+  private async comparePassword(enteredPassword, dbPassword) {
+    const match = await bcrypt.compare(enteredPassword, dbPassword);
+    return match;
   }
 
   /**
    * Returns a user by their unique email address or undefined
    *
    * @param {string} email address of user, not case sensitive
-   * @returns {(Promise<UserDocument | undefined>)}
+   * @returns {(Promise<UserEntity | undefined>)}
    * @memberof UsersService
    */
-  async findOneByEmail(email: string): Promise<UserDocument | undefined> {
-    const user = await this.userModel
-      .findOne({ lowercaseEmail: email.toLowerCase() })
-      .exec();
+  async findOneByEmail(email: string): Promise<UserEntity | null> {
+    const user = await this.userRepo
+      .findOne({ where: { lowercaseEmail: email.toLowerCase() } })
     if (user) return user;
-    return undefined;
+    return null;
   }
 
   /**
    * Returns a user by their unique username or undefined
    *
    * @param {string} username of user, not case sensitive
-   * @returns {(Promise<UserDocument | undefined>)}
+   * @returns {(Promise<UserEntity | undefined>)}
    * @memberof UsersService
    */
-  async findOneByUsername(username: string): Promise<UserDocument | undefined> {
-    const user = await this.userModel
-      .findOne({ lowercaseUsername: username.toLowerCase() })
-      .exec();
-    if (user) return user;
-    return undefined;
+  async findOneByUsername(username: string): Promise<UserEntity | undefined> {
+    const user = await this.userRepo
+      .findOne({ where: { lowercaseUsername: username.toLowerCase() } })
+    if (user) { return user; }
   }
 
   /**
    * Gets all the users that are registered
    *
-   * @returns {Promise<UserDocument[]>}
+   * @returns {Promise<UserEntity[]>}
    * @memberof UsersService
    */
-  async getAllUsers(): Promise<UserDocument[]> {
-    const users = await this.userModel.find().exec();
+  async getAllUsers(): Promise<UserEntity[]> {
+    const users = await this.userRepo.find({});
     return users;
   }
 
@@ -281,7 +297,8 @@ export class UsersService {
    * @memberof UsersService
    */
   async deleteAllUsers(): Promise<void> {
-    await this.userModel.deleteMany({});
+    // await this.userModel.deleteMany({});
+    return null;
   }
 
   /**
@@ -294,29 +311,12 @@ export class UsersService {
    * @returns {Error}
    * @memberof UsersService
    */
-  private evaluateMongoError(
-    error: MongoError,
+  private evaluateDBError(
+    error: Error,
     createUserInput: CreateUserInput,
   ): Error {
-    if (error.code === 11000) {
-      if (
-        error.message
-          .toLowerCase()
-          .includes(createUserInput.email.toLowerCase())
-      ) {
-        throw new Error(
-          `e-mail ${createUserInput.email} is already registered`,
-        );
-      } else if (
-        error.message
-          .toLowerCase()
-          .includes(createUserInput.username.toLowerCase())
-      ) {
-        throw new Error(
-          `Username ${createUserInput.username} is already registered`,
-        );
-      }
-    }
-    throw new Error(error.message);
+    throw new Error(
+      `Username ${createUserInput.username} is already registered`,
+    );
   }
 }

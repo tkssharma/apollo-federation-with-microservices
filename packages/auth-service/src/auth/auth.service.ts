@@ -3,10 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { LoginUserInput, User, LoginResult } from '../graphql.classes';
-import { UserDocument } from '../users/schemas/user.schema';
 import { ConfigService } from '../config/config.service';
 import { resolve } from 'path';
 import { Console } from 'console';
+import { UserEntity } from '../users/entity/users.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +32,7 @@ export class AuthService {
     console.log(loginAttempt)
 
     // This will be used for the initial login
-    let userToAttempt: UserDocument | undefined;
+    let userToAttempt: UserEntity | undefined;
     if (loginAttempt.email) {
       userToAttempt = await this.usersService.findOneByEmail(
         loginAttempt.email,
@@ -42,8 +43,7 @@ export class AuthService {
     // Check the supplied password against the hash stored for this email address
     let isMatch = false;
     try {
-      isMatch = await userToAttempt.checkPassword(loginAttempt.password);
-      console.log(isMatch);
+      isMatch = await this.comparePassword(loginAttempt.password, userToAttempt.password);
     } catch (error) {
       console.log(error);
       return undefined;
@@ -52,15 +52,20 @@ export class AuthService {
     if (isMatch) {
       // If there is a successful match, generate a JWT for the user
       const token = this.createJwt(userToAttempt!).token;
-      const result: LoginResult = {
+      const result: any = {
         user: userToAttempt!,
         token,
       };
-      userToAttempt.lastSeenAt = new Date();
+      userToAttempt.updated_at = new Date();
       userToAttempt.save();
       return result;
     }
     return null;
+  }
+
+  private async comparePassword(enteredPassword, dbPassword) {
+    const match = await bcrypt.compare(enteredPassword, dbPassword);
+    return match;
   }
 
   /**
@@ -72,13 +77,13 @@ export class AuthService {
    */
   async validateJwtPayload(
     payload: JwtPayload,
-  ): Promise<UserDocument | undefined> {
+  ): Promise<UserEntity | undefined> {
     // This will be used when the user has already logged in and has a JWT
     const user = await this.usersService.findOneByUsername(payload.username);
 
     // Ensure the user exists and their account isn't disabled
-    if (user && user.enabled) {
-      user.lastSeenAt = new Date();
+    if (user) {
+      user.updated_at = new Date();
       user.save();
       return user;
     }
@@ -95,7 +100,7 @@ export class AuthService {
    * token created by signing the data.
    * @memberof AuthService
    */
-  createJwt(user: User): { data: JwtPayload; token: string } {
+  createJwt(user: UserEntity): { data: JwtPayload; token: string } {
     const expiresIn = this.configService.get().auth.expireIn as number;
     let expiration: Date | undefined;
     if (expiresIn) {
@@ -103,7 +108,7 @@ export class AuthService {
       expiration.setTime(expiration.getTime() + expiresIn * 1000);
     }
     const data: JwtPayload = {
-      userId: user._id,
+      userId: user.id,
       username: user.username,
       permissions: user.permissions,
       expiration,
