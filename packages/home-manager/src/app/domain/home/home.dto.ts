@@ -1,5 +1,10 @@
 
-export class CreatePokemonDto {
+export class CreateHomeDto {
   public name!: string;
-  public type!: string;
+  public locality_id!: string;
+  public description!: string;
+  public display_images!: string[];
+  public original_images!: string[];
+  public is_active!: boolean;
+  public metadata!: any;
 }

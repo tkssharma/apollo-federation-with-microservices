@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
-import { PokemonService } from './home.service';
+import { HomeService } from './home.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PokemonResolver } from './home.resolver';
-import { HomeEntity } from '../entity/home.entity';
+import { HomeResolver } from './home.resolver';
+import { Homes } from '../entity/home.entity';
+import { HomeLocality } from '../entity/home-locality.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([HomeEntity])],
-  providers: [PokemonService, PokemonResolver],
+  imports: [TypeOrmModule.forFeature([Homes, HomeLocality])],
+  providers: [HomeService, HomeResolver],
 })
 export class HomeModule {
 }

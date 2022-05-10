@@ -7,28 +7,57 @@
 
 /* tslint:disable */
 /* eslint-disable */
-export class Pokemon {
+export class HomeInput {
+    name: string;
+    locality_id: string;
+    description: string;
+}
+
+export class HomeLocalityInput {
+    city: string;
+    street: string;
+    state: string;
+    zip_code: string;
+    country: string;
+}
+
+export class Home {
     id: string;
     name: string;
-    type: string;
+    locality_id: string;
+    description: string;
+    display_images?: Nullable<string[]>;
+    original_images?: Nullable<string[]>;
+    is_active: boolean;
 }
 
 export abstract class IQuery {
-    abstract pokemons(): Nullable<Pokemon[]> | Promise<Nullable<Pokemon[]>>;
+    abstract homes(): Nullable<Home[]> | Promise<Nullable<Home[]>>;
 
-    abstract pokemon(id?: Nullable<string>): Pokemon | Promise<Pokemon>;
-}
+    abstract home(id?: Nullable<string>): Home | Promise<Home>;
 
-export class Deleted {
-    delete: boolean;
+    abstract allLocalities(): Nullable<HomeLocality[]> | Promise<Nullable<HomeLocality[]>>;
+
+    abstract locality(id?: Nullable<string>): HomeLocality | Promise<HomeLocality>;
 }
 
 export abstract class IMutation {
-    abstract create(name: string, type: string): Nullable<Pokemon> | Promise<Nullable<Pokemon>>;
+    abstract createHome(payload: HomeInput): Nullable<Home> | Promise<Nullable<Home>>;
 
-    abstract update(id: string, name: string, type: string): Nullable<Pokemon> | Promise<Nullable<Pokemon>>;
+    abstract updateHome(id: string, payload: HomeInput): Nullable<Home> | Promise<Nullable<Home>>;
 
-    abstract delete(id: string): Nullable<Deleted> | Promise<Nullable<Deleted>>;
+    abstract createLocality(payload: HomeLocalityInput): Nullable<HomeLocality> | Promise<Nullable<HomeLocality>>;
+
+    abstract updateLocality(id: string, payload: HomeLocalityInput): Nullable<HomeLocality> | Promise<Nullable<HomeLocality>>;
+}
+
+export class HomeLocality {
+    id: string;
+    city: string;
+    street: string;
+    state?: Nullable<string>;
+    zip_code: string;
+    country: string;
 }
 
 type Nullable<T> = T | null;

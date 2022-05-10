@@ -1,47 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { HomeEntity } from '../entity/home.entity';
-import { CreatePokemonDto } from './home.dto';
+import { Homes } from '../entity/home.entity';
+import { CreateHomeDto } from './home.dto';
+
 
 @Injectable()
-export class PokemonService {
-  constructor(@InjectRepository(HomeEntity) private readonly pokemonRepository: Repository<HomeEntity>
+export class HomeService {
+  constructor(@InjectRepository(Homes) private readonly homeRepository: Repository<Homes>
   ) {
   }
 
-  async createPokemon(data: CreatePokemonDto): Promise<HomeEntity> {
-    let pokemon = new HomeEntity();
-    pokemon.name = data.name;
-    pokemon.type = data.type;
-    await pokemon.save();
-    return pokemon;
+  async createHome(data: CreateHomeDto): Promise<Homes> {
+    let home = new Homes();
+    await home.save();
+    return home;
   }
 
-  async delete(id: string): Promise<HomeEntity> {
-    const pokemon = await this.pokemonRepository.findOne({ where: { id } });
-    await this.pokemonRepository.delete(id);
-    return pokemon!;
+
+  async updateHome(id: string, data: CreateHomeDto): Promise<Homes> {
+    const home = await this.homeRepository.findOne({ where: { id } });
+    const updated = { ...home, ...data }
+    return await this.homeRepository.save(updated)
   }
 
-  async update(id: string, data: CreatePokemonDto): Promise<HomeEntity> {
-    const pokemon = await this.pokemonRepository.findOne({ where: { id } });
-    pokemon!.name = data.name;
-    pokemon!.type = data.type;
-    await pokemon!.save();
-    return pokemon!;
-  }
-  // assign league to the pokemon 
-  async assignLeague(id: string, leagueId: string) {
-    const pokemon = await this.pokemonRepository.findOne({ where: { id } });
-    return pokemon;
+  async listAll() {
+    return await this.homeRepository.find({});
   }
 
-  async show(id: string) {
-    return await this.pokemonRepository.findOne({ where: { id } });
-  }
-
-  async getPokemons() {
-    return await this.pokemonRepository.find({});
+  async getById(id: string) {
+    return await this.homeRepository.findOne({ where: { id } });
   }
 }

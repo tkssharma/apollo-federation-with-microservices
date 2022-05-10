@@ -1,0 +1,28 @@
+type HomeLocality {
+	id: String!
+	city: String!
+	street: String!
+	state: String
+	zip_code: String!
+	country: String!
+}
+
+type Query {
+	allLocalities: [HomeLocality!]
+	locality(id: ID): HomeLocality!
+}
+
+
+input HomeLocalityInput {
+	city: String!
+	street: String!
+	state: String!
+	zip_code: String!
+	country: String!
+}
+
+
+type Mutation {
+	createLocality(payload: HomeLocalityInput!): HomeLocality
+	updateLocality(id: ID!, payload: HomeLocalityInput!): HomeLocality
+}

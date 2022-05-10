@@ -1,36 +1,29 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
-import { HomeEntity } from '../entity/home.entity';
-import { PokemonService } from './home.service';
+import { Homes } from '../entity/home.entity';
+import { HomeService } from './home.service';
 
-@Resolver(HomeEntity)
-export class PokemonResolver {
-  constructor(private pokemonService: PokemonService) {
+@Resolver((of: any) => Homes)
+export class HomeResolver {
+  constructor(private homeService: HomeService) {
   }
 
   @Query()
-  async pokemons() {
-    return await this.pokemonService.getPokemons();
-  }
-
-  @Mutation()
-  async create(@Args('name') name: any, @Args('type') type: any) {
-    return this.pokemonService.createPokemon({ name, type });
-  }
-
-  @Mutation()
-  async update(@Args('id') id: any, @Args('name') name: any, @Args('type') type: any) {
-    return this.pokemonService.update(id, { name, type });
-  }
-
-
-  @Mutation()
-  async delete(@Args('id') id: any) {
-    await this.pokemonService.delete(id);
-    return { delete: true };
+  async homes() {
+    return await this.homeService.listAll();
   }
 
   @Query()
-  async pokemon(@Args('id') id: string) {
-    return await this.pokemonService.show(id);
+  async home(@Args('id') id: string) {
+    return await this.homeService.getById(id);
+  }
+
+  @Mutation()
+  async createHome(@Args('HomeInput') homeInput: any) {
+    return this.homeService.createHome(homeInput);
+  }
+
+  @Mutation()
+  async updateHome(@Args('id') id: string, @Args('HomeInput') homeInput: any) {
+    return this.homeService.updateHome(id, homeInput);
   }
 }

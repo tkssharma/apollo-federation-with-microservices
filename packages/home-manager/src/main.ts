@@ -17,7 +17,6 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, opts);
   app.disable('x-powered-by');
   app.useLogger(app.get(Logger));
-  app.useGlobalFilters(new HttpExceptionFilter(app.get(Logger)));
   app.enableCors({
     exposedHeaders: 'X-Document-Name',
   });

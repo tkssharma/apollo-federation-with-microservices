@@ -4,14 +4,19 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ConfigModule } from '@app/config/config.module';
 import { DbModule } from '../../db/db.module';
-import { HomeEntity } from './entity/home.entity';
 import { GraphQLFederationModule } from '@nestjs/graphql';
+import { HomeLocality } from './entity/home-locality.entity';
+import { HomeFacility } from './entity/home-facility.entity';
+import { Homes } from './entity/home.entity';
+import { FacilitiesMapping } from './entity/facilities.entity';
+import { LocalityModule } from './locality/locality.module';
 import { HomeModule } from './home/home.module';
-
 @Module({
   imports: [
+    HomeModule,
+    LocalityModule,
     DbModule.forRoot({
-      entities: [HomeEntity]
+      entities: [HomeLocality, HomeFacility, Homes, FacilitiesMapping]
     }),
     ConfigModule,
     GraphQLModule.forRoot({
@@ -26,7 +31,6 @@ import { HomeModule } from './home/home.module';
       path: '/graphql-federated',
       typePaths: ['./**/*.{graphql,graphql.federation}'],
     }),
-    HomeModule,
   ]
 })
 

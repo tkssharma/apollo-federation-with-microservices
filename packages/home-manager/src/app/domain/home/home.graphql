@@ -1,20 +1,25 @@
-type Pokemon {
+type Home {
     id: String!
-    name:String!
-    type: String!
+    name: String!
+    locality_id: String!
+    description: String!
+    display_images: [String!]
+    original_images: [String!]
+    is_active: Boolean!
 }
 
 type Query {
-    pokemons: [Pokemon!]
-    pokemon(id: ID): Pokemon!
+    homes: [Home!]
+    home(id: ID): Home!
 }
 
-type Deleted {
-    delete: Boolean!
+input HomeInput {
+  name: String!
+  locality_id: String!
+  description: String!
 }
 
 type Mutation {
-    create(name: String!, type: String!): Pokemon
-    update(id: ID!, name: String!, type: String!): Pokemon
-    delete(id: ID!): Deleted
+    createHome(payload: HomeInput!): Home
+    updateHome(id: ID!, payload: HomeInput!): Home
 }
