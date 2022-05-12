@@ -5,7 +5,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import { Logger } from '../logger/logger';
-import { AppLoggerModule } from '../logger/logger.module';
+import { LoggerModule } from '../logger/logger.module';
 import { DbConfigError } from './db.errors';
 import { DbConfig } from './db.interface';
 @Module({})
@@ -40,7 +40,7 @@ export class DbModule {
       module: DbModule,
       imports: [
         TypeOrmModule.forRootAsync({
-          imports: [ConfigModule, AppLoggerModule],
+          imports: [ConfigModule, LoggerModule],
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           useFactory: (configService: ConfigService, logger: Logger) => DbModule.getConnectionOptions(configService, dbconfig),
           inject: [ConfigService],

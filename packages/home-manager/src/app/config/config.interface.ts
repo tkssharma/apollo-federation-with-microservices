@@ -5,6 +5,10 @@ export interface ConfigDBData {
   url?: string;
 }
 
+export interface AuthConfig {
+  jwtSecret: string,
+  expireIn: number;
+}
 
 export interface SendGridConfig {
   apiKey: string;
@@ -26,6 +30,8 @@ export interface ConfigData {
   db: ConfigDBData;
 
   sendGrid: SendGridConfig;
+
+  auth: AuthConfig;
   /**
    * The log level to use.
    * @example 'verbose', 'info', 'warn', 'error'

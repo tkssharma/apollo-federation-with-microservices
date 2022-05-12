@@ -1,11 +1,12 @@
+scalar Date
+
 type HomeLocality {
-	id: String!
 	city: String!
+  name: String!
 	street: String!
 	state: String
 	zip_code: String!
 	country: String!
-  user: User
   id: ID!
 }
 extend type User @key(fields: "id") {
@@ -18,15 +19,14 @@ type Query {
 	locality(id: ID): HomeLocality!
 }
 
-
 input HomeLocalityInput {
 	city: String!
-	street: String!
+  street: String!
 	state: String!
 	zip_code: String!
 	country: String!
+  name: String!
 }
-
 
 type Mutation {
 	createLocality(payload: HomeLocalityInput!): HomeLocality

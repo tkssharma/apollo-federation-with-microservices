@@ -20,13 +20,14 @@ export class HomeLocalityResolver {
   }
 
   @Mutation()
-  async createLocality(@Args() args: GetLocalityArgs) {
-    return this.homeLocalityService.createHomeLocality(args);
+  async createLocality(@Args() args: GetLocalityArgs, @Context() context: any) {
+    const { userid } = context.req.headers;
+    return await this.homeLocalityService.createHomeLocality(args, userid);
   }
 
   @Mutation()
-  async updateLocality(@Args('id') id: string, @Args('HomeLocalityInput') homeLocalityInput: any) {
-    return this.homeLocalityService.updateHomeLocality(id, homeLocalityInput);
+  async updateLocality(@Args('id') id: string, @Args() args: GetLocalityArgs) {
+    return this.homeLocalityService.updateHomeLocality(id, args);
   }
 
   @ResolveField('user')

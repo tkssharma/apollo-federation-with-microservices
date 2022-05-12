@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Context, ResolveReference } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateUserInput, User, UpdateUserInput } from '../graphql.classes';
@@ -114,5 +114,10 @@ export class UserResolver {
     const user = await this.usersService.removePermission('admin', username);
     if (!user) throw new UserInputError('The user does not exist');
     return user;
+  }
+
+  @ResolveReference()
+  resolveReference(reference: { __typename: string; id: string }) {
+    return this.usersService.findOneByUserId(reference.id);
   }
 }

@@ -10,7 +10,7 @@ import { LoggerMiddleware } from './logger.middleware';
   providers: [Logger],
   exports: [Logger],
 })
-export class AppLoggerModule implements NestModule {
+export class LoggerModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggerMiddleware)

@@ -14,14 +14,13 @@ type Mutation {
   resetPassword(username: String!, code: String!, password: String!): User!
 }
 
-type User @key(fields: "id") {
+type User {
   id: ID!
   username: String!
   email: String!
   permissions: [String!]!
   created_at: Date!
   updated_at: Date!
-  id: String!
 }
 
 input CreateUserInput {

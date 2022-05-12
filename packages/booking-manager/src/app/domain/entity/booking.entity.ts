@@ -38,8 +38,7 @@ export class Bookings extends BaseEntity {
 
 
   @Column('varchar')
-  public note!: string;
-
+  public note?: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   public created_at!: Date;

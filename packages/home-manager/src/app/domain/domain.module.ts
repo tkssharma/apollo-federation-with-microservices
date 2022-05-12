@@ -4,15 +4,21 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ConfigModule } from '@app/config/config.module';
 import { DbModule } from '../../db/db.module';
-import { GraphQLFederationModule } from '@nestjs/graphql';
 import { HomeLocality } from './entity/home-locality.entity';
 import { HomeFacility } from './entity/home-facility.entity';
 import { Homes } from './entity/home.entity';
 import { FacilitiesMapping } from './entity/facilities.entity';
 import { LocalityModule } from './locality/locality.module';
 import { HomeModule } from './home/home.module';
+import { LoggerModule } from '@logger/logger.module';
+import {
+  ApolloFederationDriver,
+  ApolloFederationDriverConfig,
+} from '@nestjs/apollo';
+
 @Module({
   imports: [
+    LoggerModule,
     HomeModule,
     LocalityModule,
     DbModule.forRoot({
@@ -21,15 +27,8 @@ import { HomeModule } from './home/home.module';
     ConfigModule,
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
-      definitions: {
-        path: join(process.cwd(), 'graphql.schama.ts'),
-        outputAs: 'class'
-      }
-    }),
-    GraphQLFederationModule.forRoot({
-      debug: false,
-      path: '/graphql-federated',
-      typePaths: ['./**/*.{graphql,graphql.federation}'],
+      driver: ApolloFederationDriver,
+      context: ({ req }: any) => ({ req })
     }),
   ]
 })

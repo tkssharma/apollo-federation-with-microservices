@@ -1,16 +1,50 @@
 import { RemoteGraphQLDataSource } from '@apollo/gateway';
-import { Module, BadRequestException } from '@nestjs/common';
+import {
+  Module,
+  BadRequestException,
+  HttpStatus,
+  HttpException,
+} from '@nestjs/common';
 import { IntrospectAndCompose } from '@apollo/gateway';
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
-import { verify } from 'jsonwebtoken';
+import { verify, decode } from 'jsonwebtoken';
+import { INVALID_AUTH_TOKEN, INVALID_BEARER_TOKEN } from './app.constants';
 
+const getToken = (authToken: string): string => {
+  console.log(authToken);
+  const match = authToken.match(/^Bearer (.*)$/);
+  if (!match || match.length < 2) {
+    throw new HttpException(
+      { message: INVALID_BEARER_TOKEN },
+      HttpStatus.UNAUTHORIZED,
+    );
+  }
+  console.log(match[1]);
+  return match[1];
+};
+
+const decodeToken = (tokenString: string) => {
+  const decoded = verify(tokenString, process.env.SECRET_KEY);
+  console.log(process.env.SECRET_KEY, decoded);
+  if (!decoded) {
+    throw new HttpException(
+      { message: INVALID_AUTH_TOKEN },
+      HttpStatus.UNAUTHORIZED,
+    );
+  }
+  return decoded;
+};
 const handleAuth = ({ req }) => {
   try {
     if (req.headers.authorization) {
-      console.log(req.headers.authorization);
-      const decoded: any = verify(req.headers.authorization, 'HELLODEMO');
-      return { userId: decoded.userId, permissions: decoded.permissions };
+      const token = getToken(req.headers.authorization);
+      const decoded: any = decodeToken(token);
+      return {
+        userId: decoded.userId,
+        permissions: decoded.permissions,
+        authorization: `${req.headers.authorization}`,
+      };
     }
   } catch (err) {
     throw new BadRequestException();
@@ -29,12 +63,16 @@ const handleAuth = ({ req }) => {
             url,
             willSendRequest({ request, context }: any) {
               request.http.headers.set('userId', context.userId);
+              // for now pass authorization also
+              request.http.headers.set('authorization', context.authorization);
               request.http.headers.set('permissions', context.permissions);
             },
           });
         },
         serviceList: [
-          { name: 'user', url: 'http://localhost:3000/graphql-federated' },
+          { name: 'auth', url: 'http://localhost:5006/graphql' },
+          { name: 'homes', url: 'http://localhost:5003/graphql' },
+          { name: 'bookings', url: 'http://localhost:5004/graphql' },
         ],
       },
     }),
