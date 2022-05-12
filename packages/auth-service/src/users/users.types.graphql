@@ -15,12 +15,12 @@ type Mutation {
 }
 
 type User {
+  id: ID!
   username: String!
   email: String!
   permissions: [String!]!
   created_at: Date!
   updated_at: Date!
-  id: String!
 }
 
 input CreateUserInput {

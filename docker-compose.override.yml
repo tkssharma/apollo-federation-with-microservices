@@ -9,7 +9,7 @@ services:
       - ./docker-utils:/docker-entrypoint-initdb.d
       - auth_api_data:/data/postgres
     ports:
-      - 5400:5432
+      - 5431:5432
   postgres-home-manager:
     environment:
       - POSTGRES_USER=api
@@ -19,7 +19,7 @@ services:
       - ./docker-utils:/docker-entrypoint-initdb.d
       - home_manager_api_data:/data/postgres
     ports:
-      - 5401:5432
+      - 5433:5432
   postgres-booking-manager:
     environment:
       - POSTGRES_USER=api
@@ -29,7 +29,7 @@ services:
       - ./docker-utils:/docker-entrypoint-initdb.d
       - booking_manager_api_data:/data/postgres
     ports:
-      - 5402:5432
+      - 5434:5432
 volumes:
   auth_api_data: {}
   home_manager_api_data: {}

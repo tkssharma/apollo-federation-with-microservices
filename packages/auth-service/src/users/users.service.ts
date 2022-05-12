@@ -267,6 +267,20 @@ export class UsersService {
   }
 
   /**
+ * Returns a user by their unique email address or undefined
+ *
+ * @param {userId} string user ruuid
+ * @returns {(Promise<UserEntity | undefined>)}
+ * @memberof UsersService
+ */
+  async findOneByUserId(id: string): Promise<UserEntity | null> {
+    const user = await this.userRepo
+      .findOne({ where: { id } })
+    if (user) return user;
+    return null;
+  }
+
+  /**
    * Returns a user by their unique username or undefined
    *
    * @param {string} username of user, not case sensitive

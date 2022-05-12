@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { urlJoin } from 'url-join-ts';
 import { DEFAULT_CONFIG } from './config.default';
-import { ConfigData, ConfigDBData, SendGridConfig } from './config.interface';
+import { AuthConfig, ConfigData, ConfigDBData, SendGridConfig } from './config.interface';
 
 
 /**
@@ -30,6 +30,14 @@ export class ConfigService {
       logLevel: env.LOG_LEVEL || DEFAULT_CONFIG.logLevel,
       newRelicKey: env.NEW_RELIC_KEY || DEFAULT_CONFIG.newRelicKey,
       sendGrid: this.parseSendGridConfigFromEnv(env),
+      auth: this.parseAuthConfigFromEnv(env)
+    };
+  }
+
+  private parseAuthConfigFromEnv(env: NodeJS.ProcessEnv): AuthConfig {
+    return {
+      jwtSecret: env.JWT_SECRET || '',
+      expireIn: Number(env.JWT_EXPIRE_IN) || 268000
     };
   }
 

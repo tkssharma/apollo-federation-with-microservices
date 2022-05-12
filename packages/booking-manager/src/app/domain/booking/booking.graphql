@@ -1,0 +1,31 @@
+scalar Date
+
+type Booking {
+	id: ID!
+	user_id: String!
+	invoice_id: String!
+	home_id: String!
+	start_date: Date!
+	end_Date: Date!
+	status: String!
+}
+
+type Query {
+	bookings: [Booking!]
+	allHomeBookings(id: ID): [Booking!]
+	booking(id: ID): Booking!
+}
+
+input BookingInput {
+	user_id: String!
+	invoice_id: String!
+	home_id: String!
+	start_date: Date
+	end_Date: Date
+	status: String!
+}
+
+type Mutation {
+	createBooking(payload: BookingInput!): Booking
+	updateBooking(id: ID!, payload: BookingInput!): Booking
+}

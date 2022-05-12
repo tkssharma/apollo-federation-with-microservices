@@ -5,4 +5,5 @@ export class CreateHomeLocalityDto {
   public state!: string;
   public zip_code!: string;
   public country!: string;
+  public name!: string;
 }

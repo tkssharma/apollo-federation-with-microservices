@@ -11,6 +11,10 @@ export const DEFAULT_CONFIG: ConfigData = {
     apiKey: '',
     verifiedEmail: ''
   },
+  auth: {
+    jwtSecret: '',
+    expireIn: 0
+  },
   port: 3000,
   logLevel: 'info',
   newRelicKey: '',

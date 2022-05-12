@@ -22,4 +22,8 @@ export class GetLocalityArgs {
   @Field({ defaultValue: '' })
   @MinLength(3)
   public country!: string;
+
+  @Field({ defaultValue: '' })
+  @MinLength(3)
+  public name!: string;
 }

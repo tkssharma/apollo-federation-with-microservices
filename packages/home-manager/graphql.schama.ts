@@ -19,6 +19,7 @@ export class HomeLocalityInput {
     state: string;
     zip_code: string;
     country: string;
+    name: string;
 }
 
 export class Home {
@@ -54,6 +55,7 @@ export abstract class IMutation {
 export class HomeLocality {
     id: string;
     city: string;
+    name: string;
     street: string;
     state?: Nullable<string>;
     zip_code: string;

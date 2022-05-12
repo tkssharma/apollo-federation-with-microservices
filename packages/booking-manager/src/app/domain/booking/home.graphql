@@ -1,7 +1,0 @@
-type Query {
-  sayHi: [String]  
-}
-
-type Mutation {
-  sayHello: [String]  
-}
