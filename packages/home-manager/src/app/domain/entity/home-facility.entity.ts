@@ -21,7 +21,10 @@ export class HomeFacility extends BaseEntity {
   public id!: string;
 
   @Column('varchar', { length: 500 })
-  public display!: string;
+  public display_name!: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  public description!: string;
 
   @Column({ type: 'jsonb', default: [] })
   public display_images!: string[];

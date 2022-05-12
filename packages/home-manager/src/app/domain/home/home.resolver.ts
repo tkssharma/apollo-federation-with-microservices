@@ -30,8 +30,12 @@ export class HomeResolver {
   }
   @ResolveField('locality')
   getLocality(@Parent() home: any) {
-    console.log(home);
     return { __typename: 'HomeLocality', id: home.home_locality_id };
+  }
+
+  @ResolveField('facilities')
+  getAllFacilities(@Parent() home: any) {
+    return { __typename: 'HomeFacilityMapping', id: home.id };
   }
 
   @ResolveField('user')

@@ -2,12 +2,22 @@ scalar Date
 
 type Booking {
 	id: ID!
-	user_id: String!
+	user: User
 	invoice_id: String!
-	home_id: String!
-	start_date: Date!
-	end_Date: Date!
+	home: Home
+	start_date: String!
+	end_date: String!
 	status: String!
+  created_at: Date
+  updated_at: Date
+}
+
+extend type Home @key(fields: "id") {
+  id: ID! @external
+}
+
+extend type User @key(fields: "id") {
+  id: ID! @external
 }
 
 type Query {
@@ -17,11 +27,10 @@ type Query {
 }
 
 input BookingInput {
-	user_id: String!
 	invoice_id: String!
 	home_id: String!
-	start_date: Date
-	end_Date: Date
+	start_date: String!
+	end_date: String!
 	status: String!
 }
 
