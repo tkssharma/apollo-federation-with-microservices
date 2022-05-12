@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Context, ResolveField, Parent, ResolveReference } from '@nestjs/graphql';
 import { Homes } from '../entity/home.entity';
 import { HomeLocality } from '../entity/home-locality.entity';
 import { HomeLocalityService } from './locality.service';
@@ -21,12 +21,21 @@ export class HomeLocalityResolver {
 
   @Mutation()
   async createLocality(@Args() args: GetLocalityArgs) {
-    console.log(args);
     return this.homeLocalityService.createHomeLocality(args);
   }
 
   @Mutation()
   async updateLocality(@Args('id') id: string, @Args('HomeLocalityInput') homeLocalityInput: any) {
     return this.homeLocalityService.updateHomeLocality(id, homeLocalityInput);
+  }
+
+  @ResolveField('user')
+  getUser(@Parent() locality: HomeLocality) {
+    return { __typename: 'User', id: locality.user_id };
+  }
+
+  @ResolveReference()
+  resolveReference(reference: { __typename: string; id: string }) {
+    return this.homeLocalityService.getLocalityById(reference.id);
   }
 }

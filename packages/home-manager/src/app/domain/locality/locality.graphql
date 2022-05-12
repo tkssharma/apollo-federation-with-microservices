@@ -5,7 +5,13 @@ type HomeLocality {
 	state: String
 	zip_code: String!
 	country: String!
+  user: User
+  id: ID!
 }
+extend type User @key(fields: "id") {
+  id: ID! @external
+}
+
 
 type Query {
 	allLocalities: [HomeLocality!]
