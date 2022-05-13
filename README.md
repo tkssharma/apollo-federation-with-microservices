@@ -1,6 +1,11 @@
-## ATLAS FRACTIONAL
+## Atlas Fractional
 
-Lerna monorepo that holds common platform code
+
+#### example diagram to talk about gateway and other micro services
+![](https://romankudryashov.com/blog/2020/12/graphql-rust/images/architecture.png)
+
+
+Lerna monorepo that holds common platform code and all packages
 
 ## Getting Started
 
@@ -16,13 +21,118 @@ Build
 ```
 npm run build
 ```
+### Setting up the whole platform Locally 
 
-Tests
+This platform contains all these components 
 
+- User Manegement service
+- Home Manager service
+- Gateway Service
+- Home Manager Service
+
+### Running all these services 
+
+> we are using docker-compose to bootstrap all container only (database containers)
+> in the root of the project run
 ```
-npm test
+docker-compose up
 ```
-## Lerna
+> check the longs and make sure databases has been created 
+```
+git clone https://github.com/MobileLeapLabs/atlas-fractional.git
+cd atlas-fractional
+cd packages
+```
+### Running Auth service
+
+```sh
+cd auth-service
+vi .env
+```
+update env with this content 
+```
+DATABASE_URL= postgres://api:development_pass@localhost:5431/auth-api
+SENDGRID_API_KEY=23456754324567854324567
+SENDGRID_VERIFIED_SENDER_EMAIL=ack@gmail.com
+DEBUG="qapi:*"
+LOG_LEVEL=http
+PORT=5006
+NODE_ENV=local
+JWT_SECRET=HELLODEMO
+JWT_EXPIRE_IN=3600*24
+```
+Now run application in watch mode it will be live on localhost:5006 
+```sh
+npm run start:dev
+```
+
+
+### Running Home Manager
+
+```sh
+cd home-manager
+vi .env
+```
+update env with this content 
+```
+NODE_ENV=local
+LOG_LEVEL=info
+PORT=5003
+SECRET_KEY=HELLODEMO
+NEW_RELIC_KEY=
+DATABASE_URL=postgres://api:development_pass@localhost:5433/home-manager-api
+```
+Now run application in watch mode it will be live on localhost:5003 
+```sh
+npm run start:dev
+```
+
+### Running Booking Manager
+
+```sh
+cd booking-manager
+vi .env
+```
+update env with this content 
+```
+NODE_ENV=local
+LOG_LEVEL=info
+PORT=5004
+JWT_SECRET=HELLODEMO
+JWT_EXPIRE_IN=3600*24
+DATABASE_URL=postgres://api:development_pass@localhost:5434/booking-manager-api
+```
+Now run application in watch mode it will be live on localhost:5003 
+```sh
+npm run start:dev
+```
+
+
+### Running Gateway Service
+
+```sh
+cd gateway-service
+vi .env
+```
+update env with this content 
+```
+NODE_ENV=local
+LOG_LEVEL=info
+PORT=5002
+NEW_RELIC_KEY=
+SECRET_KEY=HELLODEMO
+```
+Now run application in watch mode it will be live on localhost:5002 
+```sh
+npm run start:dev
+```
+Once all services are up we can use gateway service to connect with all apis
+```sh
+http://localhost:5002/graphql
+```
+
+
+## Helpful command for Lerna
 
 Full list of commands
 
