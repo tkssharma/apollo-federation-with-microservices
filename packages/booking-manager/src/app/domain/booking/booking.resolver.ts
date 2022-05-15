@@ -1,7 +1,7 @@
 import { AdminGuard } from '@app/auth/guards/admin.guard';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
-import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context } from '@nestjs/graphql';
 import { Bookings } from '../entity/booking.entity';
 import { BookingService } from './booking.service';
 
@@ -30,13 +30,25 @@ export class BookingResolver {
 
   @Mutation()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async createBooking(@Args('BookingInput') BookingInput: any) {
-    return this.bookingService.createBooking(BookingInput);
+  async createBooking(@Args() BookingInput: any, @Context() context: any) {
+    console.log(BookingInput)
+    const { userid } = context.req.headers;
+    return await this.bookingService.createBooking(BookingInput, userid);
   }
 
   @Mutation()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async updateBooking(@Args('id') id: string, @Args('BookingInput') BookingInput: any) {
-    return this.bookingService.updateHome(id, BookingInput);
+  async updateBooking(@Args('id') id: string, @Args() BookingInput: any) {
+    return await this.bookingService.updateHome(id, BookingInput);
+  }
+
+  @ResolveField('home')
+  getAllFacilities(@Parent() booking: any) {
+    return { __typename: 'Home', id: booking.home_id };
+  }
+
+  @ResolveField('user')
+  getUser(@Parent() booking: any) {
+    return { __typename: 'User', id: booking.user_id };
   }
 }

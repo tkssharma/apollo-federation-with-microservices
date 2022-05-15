@@ -1,4 +1,5 @@
-import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context } from '@nestjs/graphql';
+import { HomeLocality } from '../entity/home-locality.entity';
 import { Homes } from '../entity/home.entity';
 import { HomeService } from './home.service';
 
@@ -18,12 +19,27 @@ export class HomeResolver {
   }
 
   @Mutation()
-  async createHome(@Args('HomeInput') homeInput: any) {
-    return this.homeService.createHome(homeInput);
+  async createHome(@Args() args: any, @Context() context: any) {
+    const { userid } = context.req.headers;
+    return this.homeService.createHome(args, userid);
   }
 
   @Mutation()
-  async updateHome(@Args('id') id: string, @Args('HomeInput') homeInput: any) {
-    return this.homeService.updateHome(id, homeInput);
+  async updateHome(@Args('id') id: string, @Args() args: any) {
+    return this.homeService.updateHome(id, args);
+  }
+  @ResolveField('locality')
+  getLocality(@Parent() home: any) {
+    return { __typename: 'HomeLocality', id: home.home_locality_id };
+  }
+
+  @ResolveField('facilities')
+  getAllFacilities(@Parent() home: any) {
+    return { __typename: 'HomeFacilityMapping', id: home.id };
+  }
+
+  @ResolveField('user')
+  getUser(@Parent() home: any) {
+    return { __typename: 'User', id: home.user_id };
   }
 }

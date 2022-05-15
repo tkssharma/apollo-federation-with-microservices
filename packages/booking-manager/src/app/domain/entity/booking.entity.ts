@@ -37,7 +37,7 @@ export class Bookings extends BaseEntity {
   public status!: string;
 
 
-  @Column('varchar')
+  @Column({ type: 'varchar', nullable: true })
   public note?: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

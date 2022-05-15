@@ -10,6 +10,9 @@ export class Homes extends BaseEntity {
   @Column('varchar', { length: 500, unique: true })
   public name!: string;
 
+  @Column({ type: 'uuid' })
+  public user_id!: string;
+
   @OneToOne(() => HomeLocality, (event) => event.homes)
   @JoinColumn({ name: 'home_locality_id', referencedColumnName: 'id' })
   public locality!: HomeLocality

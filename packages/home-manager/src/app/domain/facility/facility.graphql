@@ -1,0 +1,29 @@
+scalar Date
+
+type HomeFacility {
+	display_name: String
+  name: String
+	description: String
+	display_images: [String!]
+	original_images: [String!]
+  id: ID!
+  created_at: Date
+  updated_at: Date
+}
+
+type Query {
+	allFacilities: [HomeFacility!]
+	facility(id: ID): HomeFacility!
+}
+
+input HomeFacilityInput {
+	display_name: String!
+  name: String!
+	description: String
+}
+
+type Mutation {
+	createFacility(payload: HomeFacilityInput!): HomeFacility
+	updateFacility(id: ID!, payload: HomeFacilityInput!): HomeFacility
+  addFacilityToHome(facility_id: ID, home_id: ID): Boolean
+}

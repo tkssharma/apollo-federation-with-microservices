@@ -14,7 +14,7 @@ type Mutation {
   resetPassword(username: String!, code: String!, password: String!): User!
 }
 
-type User {
+type User @key (fields: "id"){
   id: ID!
   username: String!
   email: String!

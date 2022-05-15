@@ -9,6 +9,10 @@ type HomeLocality {
 	country: String!
   id: ID!
 }
+extend type User @key(fields: "id") {
+  id: ID! @external
+}
+
 
 type Query {
 	allLocalities: [HomeLocality!]

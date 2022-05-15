@@ -10,9 +10,10 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
+import { BookingModule } from './booking/booking.module';
 @Module({
   imports: [
-
+    BookingModule,
     DbModule.forRoot({
       entities: [HomeShares, Bookings]
     }),

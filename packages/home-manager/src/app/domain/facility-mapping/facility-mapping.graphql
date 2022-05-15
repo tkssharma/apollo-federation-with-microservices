@@ -1,0 +1,8 @@
+scalar Date
+
+type HomeFacilityMapping {
+  homes: [Home!]
+  homes_facilities: [HomeFacility!]
+  created_at: Date
+  updated_at: Date
+}

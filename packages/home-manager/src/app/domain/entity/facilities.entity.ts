@@ -28,10 +28,6 @@ export class FacilitiesMapping extends BaseEntity {
   @JoinColumn({ name: 'facility_id', referencedColumnName: 'id' })
   public homes_facilities!: HomeFacility
 
-
-  @Column('varchar', { length: 500 })
-  public name!: string;
-
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   public created_at!: Date;
 

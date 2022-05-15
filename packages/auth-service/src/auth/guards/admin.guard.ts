@@ -9,13 +9,13 @@ import { AuthenticationError } from 'apollo-server-core';
 // or if the user is admin
 @Injectable()
 export class AdminGuard implements CanActivate {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) { }
 
   canActivate(context: ExecutionContext): boolean {
     const ctx = GqlExecutionContext.create(context);
     const request = ctx.getContext().req;
     if (request.user) {
-      const user = <User> request.user;
+      const user = <User>request.user;
       if (this.usersService.isAdmin(user.permissions)) return true;
     }
     throw new AuthenticationError(
