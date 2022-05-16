@@ -1,6 +1,6 @@
 scalar Date
 
-type HomeLocality {
+type HomeLocality @key (fields: "id"){
 	city: String!
   name: String!
 	street: String!
