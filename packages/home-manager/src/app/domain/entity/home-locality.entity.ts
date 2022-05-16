@@ -37,8 +37,8 @@ export class HomeLocality extends BaseEntity {
   @Column('varchar', { length: 500 })
   public zip_code!: string;
 
-  @OneToOne(() => Homes, (event) => event.locality)
-  public homes!: Homes
+  @OneToMany(() => Homes, (event) => event.locality)
+  public homes!: Homes[]
 
   @Column('varchar', { length: 500 })
   public name!: string;

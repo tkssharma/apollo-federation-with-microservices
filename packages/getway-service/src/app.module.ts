@@ -69,34 +69,15 @@ const handleAuth = ({ req }) => {
             },
           });
         },
-        serviceList: [
-          { name: 'auth', url: 'http://localhost:5006/graphql' },
-          { name: 'homes', url: 'http://localhost:5003/graphql' },
-          { name: 'bookings', url: 'http://localhost:5004/graphql' },
-        ],
+        supergraphSdl: new IntrospectAndCompose({
+          subgraphs: [
+            { name: 'User', url: 'http://localhost:5006/graphql' },
+            { name: 'Home', url: 'http://localhost:5003/graphql' },
+            { name: 'Booking', url: 'http://localhost:5004/graphql' },
+          ],
+        }),
       },
     }),
-    /* GraphQLGatewayModule.forRoot({
-      server: {
-        cors: true,
-        context: handleAuth,
-      },
-      gateway: {
-        buildService: ({ name, url }) => {
-          return new RemoteGraphQLDataSource({
-            url,
-            willSendRequest({ request, context }) {
-              request.http.headers.set('userId', context.userId)
-              request.http.headers.set('permissions', context.permissions)
-            }
-          })
-        },
-        serviceList: [
-          // list of services
-  
-        ],
-      },
-    }), */
   ],
 })
 export class AppModule {}

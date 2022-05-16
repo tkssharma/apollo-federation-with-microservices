@@ -276,6 +276,7 @@ export class UsersService {
   async findOneByUserId(id: string): Promise<UserEntity | null> {
     const user = await this.userRepo
       .findOne({ where: { id } })
+    console.log(user);
     if (user) return user;
     return null;
   }

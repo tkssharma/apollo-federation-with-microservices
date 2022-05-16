@@ -42,13 +42,16 @@ export class BookingResolver {
     return await this.bookingService.updateHome(id, BookingInput);
   }
 
-  @ResolveField('home')
-  getAllFacilities(@Parent() booking: any) {
+  @ResolveField()
+  home(@Parent() booking: any) {
+    console.log(booking);
     return { __typename: 'Home', id: booking.home_id };
   }
 
-  @ResolveField('user')
-  getUser(@Parent() booking: any) {
+
+  @ResolveField()
+  user(@Parent() booking: any) {
+    console.log(booking)
     return { __typename: 'User', id: booking.user_id };
   }
 }

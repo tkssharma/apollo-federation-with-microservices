@@ -19,9 +19,9 @@ export class UserResolver {
     return await this.usersService.getAllUsers();
   }
 
-  @Query('user')
+  @Query('userLogin')
   @UseGuards(JwtAuthGuard, UsernameEmailAdminGuard)
-  async user(
+  async userLogin(
     @Args('username') username?: string,
     @Args('email') email?: string,
   ): Promise<UserEntity> {
@@ -117,7 +117,13 @@ export class UserResolver {
   }
 
   @ResolveReference()
-  resolveReference(reference: { __typename: string; id: string }) {
-    return this.usersService.findOneByUserId(reference.id);
+  async resolveReference(reference: { __typename: string; id: string }) {
+    return await this.usersService.findOneByUserId(reference.id);
+  }
+
+  @Query('user')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  user(@Args('id') id: string) {
+    return this.usersService.findOneByUserId(id);
   }
 }

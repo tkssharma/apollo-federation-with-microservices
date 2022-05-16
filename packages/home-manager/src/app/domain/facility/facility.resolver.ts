@@ -36,7 +36,7 @@ export class HomeFacilityResolver {
   }
 
   @ResolveReference()
-  resolveReference(reference: { __typename: string; id: string }) {
-    return this.homeFacilityService.getFacilityById(reference.id);
+  async resolveReference(reference: { __typename: string; id: string }) {
+    return await this.homeFacilityService.getFacilityById(reference.id);
   }
 }

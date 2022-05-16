@@ -5,6 +5,7 @@ type HomeLocality {
   name: String!
 	street: String!
 	state: String
+  user: User
 	zip_code: String!
 	country: String!
   id: ID!

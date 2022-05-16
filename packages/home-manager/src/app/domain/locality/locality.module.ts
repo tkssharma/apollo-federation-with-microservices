@@ -9,7 +9,7 @@ import { DateScalar } from '@app/scalars/date.scalar';
 
 
 @Module({
-  imports: [LoggerModule,TypeOrmModule.forFeature([HomeLocality])],
+  imports: [LoggerModule, TypeOrmModule.forFeature([HomeLocality])],
   providers: [HomeLocalityService, HomeLocalityResolver, DateScalar],
 })
 export class LocalityModule {

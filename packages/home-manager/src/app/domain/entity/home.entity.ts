@@ -13,7 +13,7 @@ export class Homes extends BaseEntity {
   @Column({ type: 'uuid' })
   public user_id!: string;
 
-  @OneToOne(() => HomeLocality, (event) => event.homes)
+  @ManyToOne(() => HomeLocality, (event) => event.homes)
   @JoinColumn({ name: 'home_locality_id', referencedColumnName: 'id' })
   public locality!: HomeLocality
 

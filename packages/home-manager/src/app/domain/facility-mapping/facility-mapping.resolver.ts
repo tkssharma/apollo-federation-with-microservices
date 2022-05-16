@@ -7,7 +7,7 @@ export class HomeFacilityResolver {
   constructor(private homeFacilityMappingService: HomeFacilityMappingService) {
   }
   @ResolveReference()
-  resolveReference(reference: { __typename: string; id: string }) {
-    return this.homeFacilityMappingService.getFacilityById(reference.id);
+  async resolveReference(reference: { __typename: string; id: string }) {
+    return await this.homeFacilityMappingService.getFacilityById(reference.id);
   }
 }

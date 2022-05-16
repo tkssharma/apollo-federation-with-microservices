@@ -33,7 +33,8 @@ export class BookingService {
   }
 
   async listAll() {
-    return await this.bookingRepository.find({});
+    const data = await this.bookingRepository.find({});
+    return data;
   }
 
   async listAllBookingsForHome(homeId: string) {
@@ -41,6 +42,8 @@ export class BookingService {
   }
 
   async getById(id: string) {
-    return await this.bookingRepository.findOne({ where: { id } });
+    const data = await this.bookingRepository.findOne({ where: { id } });
+    console.log(data);
+    return data;
   }
 }

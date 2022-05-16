@@ -1,24 +1,27 @@
+scalar Date
+
 type Home @key (fields: "id"){
     id: ID!
     name: String!
-    locality: HomeLocality!
-    facilities: [HomeFacility!]
-    user: User
+    locality: HomeLocality
+    user: User @provides(fields: "email")
     description: String!
     display_images: [String!]
     original_images: [String!]
     is_active: Boolean!
+    created_at: Date
+    updated_at: Date
+}
+
+extend type User @key(fields: "id") {
+  id: ID! @external
+  email: String! @external
 }
 
 type Query {
     homes: [Home!]
     home(id: ID): Home!
 }
-
-extend type User @key(fields: "id") {
-  id: ID! @external
-}
-
 
 input HomeInput {
   name: String!

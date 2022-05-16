@@ -45,7 +45,7 @@ export class HomeService {
   }
 
   async listAll() {
-    return await this.homeRepository.find({});
+    return await this.homeRepository.find({ where: {}, relations: ['locality', 'facilities'] });
   }
 
   async getById(id: string) {
@@ -63,5 +63,9 @@ export class HomeService {
 
   async getByHomeName(name: string) {
     return await this.homeRepository.findOne({ where: { name } });
+  }
+
+  async getByHomeId(id: string) {
+    return await this.homeRepository.findOne({ where: { id } });
   }
 }

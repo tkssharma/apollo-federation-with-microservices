@@ -20,11 +20,8 @@ export class HomeFacility extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
-  @Column('varchar', { length: 500 })
-  public display_name!: string;
-
-  @Column({ type: 'varchar', nullable: true })
-  public description!: string;
+  @Column('varchar', { length: 500, nullable: true })
+  public display!: string;
 
   @Column({ type: 'jsonb', default: [] })
   public display_images!: string[];

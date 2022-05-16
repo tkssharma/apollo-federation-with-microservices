@@ -27,16 +27,16 @@ export class HomeLocalityResolver {
 
   @Mutation()
   async updateLocality(@Args('id') id: string, @Args() args: GetLocalityArgs) {
-    return this.homeLocalityService.updateHomeLocality(id, args);
+    return await this.homeLocalityService.updateHomeLocality(id, args);
   }
 
-  @ResolveField('user')
-  getUser(@Parent() locality: HomeLocality) {
+  @ResolveField()
+  user(@Parent() locality: HomeLocality) {
     return { __typename: 'User', id: locality.user_id };
   }
 
   @ResolveReference()
-  resolveReference(reference: { __typename: string; id: string }) {
-    return this.homeLocalityService.getLocalityById(reference.id);
+  async resolveReference(reference: { __typename: string; id: string }) {
+    return await this.homeLocalityService.getLocalityById(reference.id);
   }
 }
