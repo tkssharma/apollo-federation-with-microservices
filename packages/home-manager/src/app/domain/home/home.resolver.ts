@@ -1,4 +1,5 @@
 import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context, ResolveReference } from '@nestjs/graphql';
+import { HomeLocality } from '../entity/home-locality.entity';
 import { Homes } from '../entity/home.entity';
 import { HomeService } from './home.service';
 
@@ -29,12 +30,7 @@ export class HomeResolver {
   }
   @ResolveField()
   locality(@Parent() home: Homes) {
-    return { __typename: 'HomeLocality', id: home.locality.id };
-  }
-
-  @ResolveField()
-  facilities(@Parent() home: Homes) {
-    return { __typename: 'HomeFacilityMapping', id: home.id };
+    return { __typename: 'HomeLocality', id: home.locality };
   }
 
   @ResolveField()

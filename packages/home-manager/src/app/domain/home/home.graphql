@@ -4,6 +4,7 @@ type Home @key (fields: "id"){
     id: ID!
     name: String!
     locality: HomeLocality
+    facilities: [HomeFacility!]
     user: User
     description: String!
     display_images: [String!]
@@ -24,7 +25,6 @@ type Query {
 
 input HomeInput {
   name: String!
-  locality_id: String!
   description: String!
 }
 

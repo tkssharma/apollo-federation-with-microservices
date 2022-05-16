@@ -44,7 +44,6 @@ export class BookingResolver {
 
   @ResolveField()
   home(@Parent() booking: any) {
-    console.log(booking);
     return { __typename: 'Home', id: booking.home_id };
   }
 

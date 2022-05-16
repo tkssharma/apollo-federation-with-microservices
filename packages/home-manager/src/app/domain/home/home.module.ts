@@ -5,12 +5,12 @@ import { HomeResolver } from './home.resolver';
 import { Homes } from '../entity/home.entity';
 import { HomeLocality } from '../entity/home-locality.entity';
 import { LoggerModule } from '@logger/logger.module';
-import { FacilitiesMapping } from '../entity/facilities.entity';
 import { DateScalar } from '@app/scalars/date.scalar';
+import { HomeFacility } from '../entity/home-facility.entity';
 
 
 @Module({
-  imports: [LoggerModule, TypeOrmModule.forFeature([Homes, HomeLocality, FacilitiesMapping])],
+  imports: [LoggerModule, TypeOrmModule.forFeature([Homes, HomeLocality, HomeFacility])],
   providers: [HomeService, HomeResolver, DateScalar],
 })
 export class HomeModule {

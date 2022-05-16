@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, CreateDateColumn, DeleteDateColumn, UpdateDateColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { HomeLocality } from './home-locality.entity';
-import { FacilitiesMapping } from './facilities.entity';
+import { HomeFacility } from './home-facility.entity';
 
 @Entity('homes')
 export class Homes extends BaseEntity {
@@ -13,12 +13,11 @@ export class Homes extends BaseEntity {
   @Column({ type: 'uuid' })
   public user_id!: string;
 
-  @ManyToOne(() => HomeLocality, (event) => event.homes)
-  @JoinColumn({ name: 'home_locality_id', referencedColumnName: 'id' })
+  @OneToOne(() => HomeLocality, (event) => event.homes)
   public locality!: HomeLocality
 
-  @OneToMany(() => FacilitiesMapping, (event) => event.homes)
-  public facilities!: FacilitiesMapping[]
+  @OneToMany(() => HomeFacility, (event) => event.homes)
+  public facilities!: HomeFacility[]
 
   @Column('varchar')
   public description!: string;

@@ -5,7 +5,6 @@ import { Homes } from '../entity/home.entity';
 import { HomeFacility } from '../entity/home-Facility.entity';
 import { CreateHomeFacilityDto } from './facility.dto';
 import { Logger } from '@logger/logger';
-import { FacilitiesMapping } from '../entity/facilities.entity';
 
 
 @Injectable()
@@ -13,41 +12,30 @@ export class HomeFacilityService {
   constructor(
     @InjectRepository(HomeFacility) private readonly homeFacilityRepository: Repository<HomeFacility>,
     @InjectRepository(Homes) private readonly homeRepository: Repository<Homes>,
-    @InjectRepository(FacilitiesMapping) private readonly facilityRepository: Repository<FacilitiesMapping>,
     private readonly logger: Logger
   ) {
   }
 
-  async createHomeFacility(data: any): Promise<HomeFacility> {
+  async createHomeFacility(data: any, userId: string): Promise<HomeFacility> {
     const body = data.payload;
     try {
+      const homes = await this.homeRepository.findOne({ where: { id: body.home_id } });
       return await this.homeFacilityRepository
-        .save({ ...body });
+        .save({ ...body, homes, user_id: userId });
     } catch (err: any) {
       this.logger.error(err);
       throw err;
     }
   }
 
-  async addFacilityToHome(facility_id: string, home_id: string): Promise<boolean> {
+  async addFacilityToHome(facility_id: string, home_id: string): Promise<HomeFacility> {
     const homeFacility = await this.homeFacilityRepository.findOne({ where: { id: facility_id } });
     const home = await this.homeRepository.findOne({ where: { id: home_id } });
     if (!(home && homeFacility)) {
       throw new BadRequestException();
     }
-    const mapping = await this.facilityRepository.findOne({
-      where: {
-        homes: home, homes_facilities: homeFacility
-      }, relations: ['homes_facilities', 'homes']
-    })
-    if (mapping) {
-      return true
-    } else {
-      await this.facilityRepository.save({
-        homes: home, homes_facilities: homeFacility
-      })
-      return true;
-    }
+    homeFacility.homes = home;
+    return await this.homeFacilityRepository.save(homeFacility);
   }
 
 

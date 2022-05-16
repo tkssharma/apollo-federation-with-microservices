@@ -3,10 +3,8 @@ scalar Date
 type Booking {
 	id: ID!
 	user: User @provides(fields: "username")
-  user_id: User
 	invoice_id: String!
 	home: Home @provides(fields: "name")
-  home_id: Home
 	start_date: Date!
 	end_date: Date!
 	status: String!
@@ -17,13 +15,11 @@ type Booking {
 extend type Home @key(fields: "id") {
   id: ID! @external
   name: String! @external
-  bookings: [Booking]
 }
 
 extend type User @key(fields: "id") {
   id: ID! @external
   username: String! @external
-  bookings:[Booking]
 }
 
 type Query {

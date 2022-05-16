@@ -20,20 +20,20 @@ export class HomeFacilityResolver {
 
   @Mutation()
   async createFacility(@Args() args: any, @Context() context: any) {
-    return await this.homeFacilityService.createHomeFacility(args);
-  }
-
-  @Mutation()
-  async addFacilityToHome(
-    @Args('facility_id') facility_id: string,
-    @Args('home_id') home_id: string) {
-    return this.homeFacilityService.addFacilityToHome(facility_id, home_id);
+    const { userid } = context.req.headers;
+    return await this.homeFacilityService.createHomeFacility(args, userid);
   }
 
   @Mutation()
   async updateFacility(@Args('id') id: string, @Args() args: any) {
     return this.homeFacilityService.updateHomeFacility(id, args);
   }
+
+  @ResolveField()
+  user(@Parent() facility: any) {
+    return { __typename: 'User', id: facility.user_id };
+  }
+
 
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {

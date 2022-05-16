@@ -11,7 +11,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { FacilitiesMapping } from './facilities.entity';
 import { Homes } from './home.entity';
 
 
@@ -19,6 +18,10 @@ import { Homes } from './home.entity';
 export class HomeFacility extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
+
+
+  @Column({ type: 'uuid' })
+  public user_id!: string;
 
   @Column('varchar', { length: 500, nullable: true })
   public display!: string;
@@ -29,8 +32,9 @@ export class HomeFacility extends BaseEntity {
   @Column({ type: 'jsonb', default: [] })
   public original_images!: string[];
 
-  @OneToMany(() => FacilitiesMapping, (event) => event.homes_facilities)
-  public facilities_mapping!: FacilitiesMapping[]
+  @ManyToOne(() => Homes, (event) => event.facilities)
+  @JoinColumn({ name: "home_id" })
+  public homes!: Homes
 
   @Column('varchar', { length: 500 })
   public name!: string;
