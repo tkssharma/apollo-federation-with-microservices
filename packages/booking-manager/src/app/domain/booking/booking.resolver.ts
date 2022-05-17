@@ -24,7 +24,7 @@ export class BookingResolver {
 
   @Query()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async allHomeBookings(@Args('id') homeId: string) {
+  async allHomeBookings(@Args('homeId') homeId: string) {
     return await this.bookingService.listAllBookingsForHome(homeId);
   }
 
@@ -40,6 +40,22 @@ export class BookingResolver {
   @UseGuards(JwtAuthGuard, AdminGuard)
   async updateBooking(@Args('id') id: string, @Args() BookingInput: any) {
     return await this.bookingService.updateHome(id, BookingInput);
+  }
+
+
+  @Mutation()
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async updateBookingStatus(@Args('id') id: string, @Args('status') status: string) {
+    // release the booking days being booked
+    // reserved -> booked -> cancelled/completed
+    if (status === 'booked') {
+      return await this.bookingService.reserveBooking(id);
+    } else if (status === 'canceled') {
+      return await this.bookingService.cancelBooking(id);
+    } else if (status === 'completed') {
+      return await this.bookingService.completeBooking(id);
+    }
+
   }
 
   @ResolveField()

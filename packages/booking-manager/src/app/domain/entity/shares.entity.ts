@@ -27,14 +27,8 @@ export class HomeShares extends BaseEntity {
   @Column({ type: 'uuid' })
   public user_id!: string;
 
-  @Column('varchar', { length: 500 })
-  public display_name!: string;
-
-  @Column({ type: 'boolean', default: true, select: true })
-  public is_active!: boolean;
-
-  @Column('varchar', { length: 500 })
-  public name!: string;
+  @Column({ type: 'varchar', nullable: true })
+  public created_by!: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   public created_at!: Date;

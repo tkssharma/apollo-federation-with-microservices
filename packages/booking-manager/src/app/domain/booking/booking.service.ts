@@ -32,6 +32,27 @@ export class BookingService {
     return await this.bookingRepository.save(updatedFacility)
   }
 
+  async cancelBooking(id: string): Promise<Bookings> {
+    const booking = await this.bookingRepository.findOne({ where: { id } });
+    const updatedBooking = { ...booking, status: 'canceled' }
+    // add side effect after cancellation
+    return await this.bookingRepository.save(updatedBooking)
+  }
+  async reserveBooking(id: string): Promise<Bookings> {
+    const booking = await this.bookingRepository.findOne({ where: { id } });
+    const updatedBooking = { ...booking, status: 'booked' }
+    // add side effect after cancellation
+    // reserve the number of days for that home from 8 shares
+    return await this.bookingRepository.save(updatedBooking)
+  }
+
+  async completeBooking(id: string): Promise<Bookings> {
+    const booking = await this.bookingRepository.findOne({ where: { id } });
+    const updatedBooking = { ...booking, status: 'completed' }
+    // mark complete
+    return await this.bookingRepository.save(updatedBooking)
+  }
+
   async listAll() {
     const data = await this.bookingRepository.find({});
     return data;

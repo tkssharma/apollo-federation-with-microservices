@@ -14,6 +14,16 @@ export class HomeResolver {
   }
 
   @Query()
+  async findHomes(@Args('name') name: string) {
+    return await this.homeService.findHome(name);
+  }
+
+  @Query()
+  async activeHomes() {
+    return await this.homeService.listAllActiveHomes();
+  }
+
+  @Query()
   async home(@Args('id') id: string) {
     return await this.homeService.getById(id);
   }

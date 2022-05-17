@@ -1,7 +1,7 @@
 import { Logger } from '@logger/logger';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Like, Repository } from 'typeorm';
 import { HomeFacility } from '../entity/home-facility.entity';
 import { HomeLocality } from '../entity/home-locality.entity';
 import { Homes } from '../entity/home.entity';
@@ -45,8 +45,16 @@ export class HomeService {
     return await this.homeRepository.find({ where: {}, relations: ['locality', 'facilities'] });
   }
 
+  async findHome(name: string) {
+    return await this.homeRepository.find({ where: { name: ILike(`%${name}%`) }, relations: ['locality', 'facilities'] });
+  }
+
+  async listAllActiveHomes() {
+    return await this.homeRepository.find({ where: { is_active: true }, relations: ['locality', 'facilities'] });
+  }
+
   async getById(id: string) {
-    return await this.homeRepository.findOne({ where: { id }, relations: ['locality', 'facilities'] });
+    return await this.homeRepository.findOne({ where: { id, is_active: true }, relations: ['locality', 'facilities'] });
   }
 
   async getByHomeName(name: string) {

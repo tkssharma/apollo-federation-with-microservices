@@ -24,7 +24,7 @@ extend type User @key(fields: "id") {
 
 type Query {
 	bookings: [Booking!]
-	allHomeBookings(id: ID): [Booking!]
+	allHomeBookings(homeId: ID): [Booking!]
 	booking(id: ID): Booking!
 }
 
@@ -39,4 +39,5 @@ input BookingInput {
 type Mutation {
 	createBooking(payload: BookingInput!): Booking
 	updateBooking(id: ID!, payload: BookingInput!): Booking
+  updateBookingStatus(id: ID!, status: String!): Booking
 }

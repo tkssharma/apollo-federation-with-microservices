@@ -21,11 +21,13 @@ extend type User @key(fields: "id") {
 type Query {
     homes: [Home!]
     home(id: ID): Home!
+    findHomes(name: String!): [Home!]
+    activeHomes: [Home!]
 }
-
 input HomeInput {
   name: String!
   description: String!
+  is_active: Boolean!
 }
 
 type Mutation {
