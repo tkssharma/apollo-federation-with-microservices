@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Homes } from '../entity/home.entity';
+import { Home } from '../entity/home.entity';
 import { HomeFacility } from '../entity/home-Facility.entity';
 import { CreateHomeFacilityDto } from './facility.dto';
 import { Logger } from '@logger/logger';
@@ -11,7 +11,7 @@ import { Logger } from '@logger/logger';
 export class HomeFacilityService {
   constructor(
     @InjectRepository(HomeFacility) private readonly homeFacilityRepository: Repository<HomeFacility>,
-    @InjectRepository(Homes) private readonly homeRepository: Repository<Homes>,
+    @InjectRepository(Home) private readonly homeRepository: Repository<Home>,
     private readonly logger: Logger
   ) {
   }
@@ -47,12 +47,12 @@ export class HomeFacilityService {
   }
 
   async listAll() {
-    return await this.homeFacilityRepository.find({ relations: ['facilities_mapping'] });
+    return await this.homeFacilityRepository.find({});
   }
 
   async getFacilityById(id: string) {
     console.log(id);
-    const data = await this.homeFacilityRepository.findOne({ where: { id }, relations: ['facilities_mapping'] });
+    const data = await this.homeFacilityRepository.findOne({ where: { id } });
     return data;
   }
 }

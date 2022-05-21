@@ -1,11 +1,12 @@
 import { Resolver, Query, Args, Mutation, Context, ResolveField, Parent, ResolveReference } from '@nestjs/graphql';
-import { Homes } from '../entity/home.entity';
+import { Home } from '../entity/home.entity';
 import { HomeFacility } from '../entity/home-Facility.entity';
 import { HomeFacilityService } from './facility.service';
+import { Logger } from '@logger/logger';
 
 @Resolver((of: any) => HomeFacility)
 export class HomeFacilityResolver {
-  constructor(private homeFacilityService: HomeFacilityService) {
+  constructor(private homeFacilityService: HomeFacilityService, private readonly logger: Logger) {
   }
 
   @Query()
@@ -31,6 +32,7 @@ export class HomeFacilityResolver {
 
   @ResolveField()
   user(@Parent() facility: any) {
+    this.logger.http("ResolveField :: facility")
     return { __typename: 'User', id: facility.user_id };
   }
 

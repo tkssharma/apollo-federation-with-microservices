@@ -4,20 +4,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Like, Repository } from 'typeorm';
 import { HomeFacility } from '../entity/home-facility.entity';
 import { HomeLocality } from '../entity/home-locality.entity';
-import { Homes } from '../entity/home.entity';
+import { Home } from '../entity/home.entity';
 import { CreateHomeDto } from './home.dto';
 
 
 @Injectable()
 export class HomeService {
   constructor(
-    @InjectRepository(Homes) private readonly homeRepository: Repository<Homes>,
+    @InjectRepository(Home) private readonly homeRepository: Repository<Home>,
     @InjectRepository(HomeLocality) private readonly homeLocalityRepository: Repository<HomeLocality>,
     private readonly logger: Logger
   ) {
   }
 
-  async createHome(data: any, userid: string): Promise<Homes> {
+  async createHome(data: any, userid: string): Promise<Home> {
     const body = data.payload;
     try {
       const existingHome = await this.homeRepository.findOne({ where: { name: body.name } })
@@ -34,7 +34,7 @@ export class HomeService {
   }
 
 
-  async updateHome(id: string, data: any): Promise<Homes> {
+  async updateHome(id: string, data: any): Promise<Home> {
     const body = data.payload;
     const homeHome = await this.homeRepository.findOne({ where: { id } });
     const updatedHome = { ...homeHome, ...body }
@@ -42,7 +42,7 @@ export class HomeService {
   }
 
   async listAll() {
-    return await this.homeRepository.find({ where: {}, relations: ['locality', 'facilities'] });
+    return await this.homeRepository.find({ relations: ['locality', 'facilities'] });
   }
 
   async findHome(name: string) {

@@ -6,11 +6,14 @@ import { DbModule } from '../../db/db.module';
 import { HomeShares } from './entity/shares.entity';
 import { Bookings } from './entity/booking.entity';
 import { AuthModule } from '@app/auth/auth.module';
+import { GraphQLFormattedError } from 'graphql';
+
 import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { BookingModule } from './booking/booking.module';
+import { GraphQLError } from 'graphql';
 @Module({
   imports: [
     BookingModule,
@@ -22,7 +25,13 @@ import { BookingModule } from './booking/booking.module';
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
       driver: ApolloFederationDriver,
-      context: ({ req }: any) => ({ req })
+      context: ({ req }: any) => ({ req }),
+      formatError: (error: GraphQLError) => {
+        const graphQLFormattedError: GraphQLFormattedError = {
+          message: error?.extensions?.exception?.response?.message || error?.message,
+        };
+        return graphQLFormattedError;
+      },
     }),
   ]
 })

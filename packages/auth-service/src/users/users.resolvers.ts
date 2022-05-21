@@ -8,10 +8,11 @@ import { AdminGuard } from '../auth/guards/admin.guard';
 import { UserInputError, ValidationError } from 'apollo-server-core';
 import { AdminAllowedArgs } from '../decorators/admin-allowed-args';
 import { UserEntity } from './entity/users.entity';
+import { Logger } from 'src/logger/logger';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private usersService: UsersService) { }
+  constructor(private usersService: UsersService, private readonly logger: Logger) { }
 
   @Query('users')
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -118,6 +119,7 @@ export class UserResolver {
 
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {
+    this.logger.http("ResolveReference :: user")
     return await this.usersService.findOneByUserId(reference.id);
   }
 

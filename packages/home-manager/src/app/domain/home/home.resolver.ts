@@ -1,11 +1,13 @@
+import { Logger } from '@logger/logger';
 import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context, ResolveReference } from '@nestjs/graphql';
 import { HomeLocality } from '../entity/home-locality.entity';
-import { Homes } from '../entity/home.entity';
+import { Home } from '../entity/home.entity';
 import { HomeService } from './home.service';
 
-@Resolver((of: any) => Homes)
+@Resolver((of: any) => Home)
 export class HomeResolver {
-  constructor(private homeService: HomeService) {
+  constructor(private homeService: HomeService,
+    private readonly logger: Logger) {
   }
 
   @Query()
@@ -38,18 +40,16 @@ export class HomeResolver {
   async updateHome(@Args('id') id: string, @Args() args: any) {
     return await this.homeService.updateHome(id, args);
   }
-  @ResolveField()
-  locality(@Parent() home: Homes) {
-    return { __typename: 'HomeLocality', id: home.locality };
-  }
 
-  @ResolveField()
-  user(@Parent() home: Homes) {
+  @ResolveField('user')
+  user(@Parent() home: Home) {
+    this.logger.http("ResolveField::user::HomeResolver" + home.user_id)
     return { __typename: 'User', id: home.user_id };
   }
 
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {
+    this.logger.http('Logging :: ResolveReference :: home')
     return await this.homeService.getByHomeId(reference.id);
   }
 

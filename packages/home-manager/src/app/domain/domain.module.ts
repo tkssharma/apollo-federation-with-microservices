@@ -6,7 +6,7 @@ import { ConfigModule } from '@app/config/config.module';
 import { DbModule } from '../../db/db.module';
 import { HomeLocality } from './entity/home-locality.entity';
 import { HomeFacility } from './entity/home-facility.entity';
-import { Homes } from './entity/home.entity';
+import { Home } from './entity/home.entity';
 import { LocalityModule } from './locality/locality.module';
 import { HomeModule } from './home/home.module';
 import { LoggerModule } from '@logger/logger.module';
@@ -23,7 +23,7 @@ import { FacilityModule } from './facility/facility.module';
     LocalityModule,
     FacilityModule,
     DbModule.forRoot({
-      entities: [HomeLocality, HomeFacility, Homes]
+      entities: [HomeLocality, HomeFacility, Home]
     }),
     ConfigModule,
     GraphQLModule.forRoot({

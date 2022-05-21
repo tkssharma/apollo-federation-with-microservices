@@ -12,6 +12,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum ShareStatus {
+  active = 'active',
+  review = 'review',
+  in_active = 'in-active'
+}
 
 @Entity({ name: 'home_shares' })
 export class HomeShares extends BaseEntity {
@@ -20,6 +25,16 @@ export class HomeShares extends BaseEntity {
 
   @Column({ type: 'integer' })
   public quantity!: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  public note!: string;
+
+  @Column({
+    type: 'enum',
+    enum: ShareStatus,
+    default: ShareStatus.active,
+  })
+  public status!: string;
 
   @Column({ type: 'uuid' })
   public home_id!: string;

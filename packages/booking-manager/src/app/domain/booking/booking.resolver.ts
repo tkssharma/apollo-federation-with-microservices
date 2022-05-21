@@ -1,5 +1,6 @@
 import { AdminGuard } from '@app/auth/guards/admin.guard';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
+import { Logger } from '@logger/logger';
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context } from '@nestjs/graphql';
 import { Bookings } from '../entity/booking.entity';
@@ -7,7 +8,7 @@ import { BookingService } from './booking.service';
 
 @Resolver((of: any) => Bookings)
 export class BookingResolver {
-  constructor(private bookingService: BookingService) {
+  constructor(private bookingService: BookingService, private readonly logger: Logger) {
   }
 
   @Query()
@@ -58,15 +59,16 @@ export class BookingResolver {
 
   }
 
-  @ResolveField()
+  @ResolveField('home')
   home(@Parent() booking: any) {
+    this.logger.http("ResolveField :: home")
     return { __typename: 'Home', id: booking.home_id };
   }
 
 
-  @ResolveField()
+  @ResolveField('user')
   user(@Parent() booking: any) {
-    console.log(booking)
+    this.logger.http("ResolveField :: user")
     return { __typename: 'User', id: booking.user_id };
   }
 }

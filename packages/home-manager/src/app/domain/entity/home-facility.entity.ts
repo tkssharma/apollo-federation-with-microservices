@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Homes } from './home.entity';
+import { Home } from './home.entity';
 
 
 @Entity({ name: 'home_facilities' })
@@ -32,9 +32,9 @@ export class HomeFacility extends BaseEntity {
   @Column({ type: 'jsonb', default: [] })
   public original_images!: string[];
 
-  @ManyToOne(() => Homes, (event) => event.facilities)
+  @ManyToOne(() => Home, (event) => event.facilities)
   @JoinColumn({ name: "home_id" })
-  public homes!: Homes
+  public homes!: Home
 
   @Column('varchar', { length: 500 })
   public name!: string;

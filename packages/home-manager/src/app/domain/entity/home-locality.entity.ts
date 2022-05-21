@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Homes } from './home.entity';
+import { Home } from './home.entity';
 
 
 @Entity({ name: 'home_locality' })
@@ -37,9 +37,9 @@ export class HomeLocality extends BaseEntity {
   @Column('varchar', { length: 500 })
   public zip_code!: string;
 
-  @OneToOne(() => Homes, (event) => event.locality)
+  @OneToOne(() => Home, (event) => event.locality)
   @JoinColumn({ name: "home_id" })
-  public homes!: Homes
+  public homes!: Home
 
   @Column('varchar', { length: 500 })
   public name!: string;

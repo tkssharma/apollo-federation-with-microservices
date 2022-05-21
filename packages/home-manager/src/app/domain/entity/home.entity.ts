@@ -3,7 +3,7 @@ import { HomeLocality } from './home-locality.entity';
 import { HomeFacility } from './home-facility.entity';
 
 @Entity('homes')
-export class Homes extends BaseEntity {
+export class Home extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
