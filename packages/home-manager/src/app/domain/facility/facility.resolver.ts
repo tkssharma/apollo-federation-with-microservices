@@ -1,11 +1,12 @@
 import { Resolver, Query, Args, Mutation, Context, ResolveField, Parent, ResolveReference } from '@nestjs/graphql';
-import { Homes } from '../entity/home.entity';
+import { Home } from '../entity/home.entity';
 import { HomeFacility } from '../entity/home-Facility.entity';
 import { HomeFacilityService } from './facility.service';
+import { Logger } from '@logger/logger';
 
 @Resolver((of: any) => HomeFacility)
 export class HomeFacilityResolver {
-  constructor(private homeFacilityService: HomeFacilityService) {
+  constructor(private homeFacilityService: HomeFacilityService, private readonly logger: Logger) {
   }
 
   @Query()
@@ -20,14 +21,8 @@ export class HomeFacilityResolver {
 
   @Mutation()
   async createFacility(@Args() args: any, @Context() context: any) {
-    return await this.homeFacilityService.createHomeFacility(args);
-  }
-
-  @Mutation()
-  async addFacilityToHome(
-    @Args('facility_id') facility_id: string,
-    @Args('home_id') home_id: string) {
-    return this.homeFacilityService.addFacilityToHome(facility_id, home_id);
+    const { userid } = context.req.headers;
+    return await this.homeFacilityService.createHomeFacility(args, userid);
   }
 
   @Mutation()
@@ -35,8 +30,15 @@ export class HomeFacilityResolver {
     return this.homeFacilityService.updateHomeFacility(id, args);
   }
 
+  @ResolveField()
+  user(@Parent() facility: any) {
+    this.logger.http("ResolveField :: facility")
+    return { __typename: 'User', id: facility.user_id };
+  }
+
+
   @ResolveReference()
-  resolveReference(reference: { __typename: string; id: string }) {
-    return this.homeFacilityService.getFacilityById(reference.id);
+  async resolveReference(reference: { __typename: string; id: string }) {
+    return await this.homeFacilityService.getFacilityById(reference.id);
   }
 }

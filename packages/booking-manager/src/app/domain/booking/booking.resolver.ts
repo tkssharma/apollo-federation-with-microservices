@@ -1,13 +1,14 @@
 import { AdminGuard } from '@app/auth/guards/admin.guard';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
+import { Logger } from '@logger/logger';
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context } from '@nestjs/graphql';
-import { Bookings } from '../entity/booking.entity';
+import { Booking } from '../entity/booking.entity';
 import { BookingService } from './booking.service';
 
-@Resolver((of: any) => Bookings)
+@Resolver((of: any) => Booking)
 export class BookingResolver {
-  constructor(private bookingService: BookingService) {
+  constructor(private bookingService: BookingService, private readonly logger: Logger) {
   }
 
   @Query()
@@ -24,7 +25,7 @@ export class BookingResolver {
 
   @Query()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async allHomeBookings(@Args('id') homeId: string) {
+  async allHomeBookings(@Args('homeId') homeId: string) {
     return await this.bookingService.listAllBookingsForHome(homeId);
   }
 
@@ -42,13 +43,32 @@ export class BookingResolver {
     return await this.bookingService.updateHome(id, BookingInput);
   }
 
+
+  @Mutation()
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async updateBookingStatus(@Args('id') id: string, @Args('status') status: string) {
+    // release the booking days being booked
+    // reserved -> booked -> cancelled/completed
+    if (status === 'booked') {
+      return await this.bookingService.reserveBooking(id);
+    } else if (status === 'canceled') {
+      return await this.bookingService.cancelBooking(id);
+    } else if (status === 'completed') {
+      return await this.bookingService.completeBooking(id);
+    }
+
+  }
+
   @ResolveField('home')
-  getAllFacilities(@Parent() booking: any) {
+  home(@Parent() booking: any) {
+    this.logger.http("ResolveField :: home" + JSON.stringify(booking));
     return { __typename: 'Home', id: booking.home_id };
   }
 
+
   @ResolveField('user')
-  getUser(@Parent() booking: any) {
+  user(@Parent() booking: any) {
+    this.logger.http("ResolveField :: user" + booking)
     return { __typename: 'User', id: booking.user_id };
   }
 }

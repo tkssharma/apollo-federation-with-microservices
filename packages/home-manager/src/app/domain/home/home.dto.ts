@@ -7,4 +7,6 @@ export class CreateHomeDto {
   public original_images!: string[];
   public is_active!: boolean;
   public metadata!: any;
+  public created_at!: Date;
+  public updated_at!: Date;
 }

@@ -6,9 +6,11 @@ import { ConfigModule } from '../config/config.module';
 import { AuthModule } from '../auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entity/users.entity';
+import { LoggerModule } from 'src/logger/logger.module';
 
 @Module({
   imports: [
+    LoggerModule,
     TypeOrmModule.forFeature([UserEntity]),
     ConfigModule,
     forwardRef(() => AuthModule),

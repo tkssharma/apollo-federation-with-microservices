@@ -76,7 +76,7 @@ vi .env
 update env with this content 
 ```
 NODE_ENV=local
-LOG_LEVEL=info
+LOG_LEVEL=http
 PORT=5003
 SECRET_KEY=HELLODEMO
 NEW_RELIC_KEY=
@@ -96,7 +96,7 @@ vi .env
 update env with this content 
 ```
 NODE_ENV=local
-LOG_LEVEL=info
+LOG_LEVEL=http
 PORT=5004
 JWT_SECRET=HELLODEMO
 JWT_EXPIRE_IN=3600*24
@@ -117,7 +117,7 @@ vi .env
 update env with this content 
 ```
 NODE_ENV=local
-LOG_LEVEL=info
+LOG_LEVEL=http
 PORT=5002
 NEW_RELIC_KEY=
 SECRET_KEY=HELLODEMO

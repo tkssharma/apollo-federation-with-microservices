@@ -9,7 +9,7 @@ import { Logger } from '../logger/logger';
 export class DbLogger implements TypeORMLogger {
   constructor(private logger: Logger) { }
 
-  private stringifyQuery(query: string, parameters?: any []) {
+  private stringifyQuery(query: string, parameters?: any[]) {
     const parametersStr = parameters ? ` (${JSON.stringify(parameters)})` : '';
     return `${query}${parametersStr}`;
   }
@@ -24,16 +24,16 @@ export class DbLogger implements TypeORMLogger {
     this.logger.warn(`DB: SLOW (${time}) - ${this.stringifyQuery(query, parameters)}`);
   }
   public logSchemaBuild(message: string) {
-    this.logger.info(`DB: ${message}`);
+    this.logger.http(`DB: ${message}`);
   }
   public logMigration(message: string) {
-    this.logger.info(`DB: ${message}`);
+    this.logger.http(`DB: ${message}`);
   }
   public log(level: 'log' | 'info' | 'warn', message: any) {
     switch (level) {
       case 'log':
       case 'info':
-        this.logger.info(`${message}`);
+        this.logger.http(`${message}`);
         break;
       case 'warn':
         this.logger.warn(`${message}`);

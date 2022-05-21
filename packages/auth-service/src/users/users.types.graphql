@@ -2,7 +2,8 @@ scalar Date
 
 type Query {
   users: [User!]!
-  user(username: String, email: String): User!
+  userLogin(username: String, email: String): User!
+  user(id: ID!): User!
   forgotPassword(email: String): Boolean
 }
 

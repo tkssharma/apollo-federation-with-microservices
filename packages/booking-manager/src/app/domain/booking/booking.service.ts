@@ -2,18 +2,18 @@ import { Logger } from '@logger/logger';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Bookings } from '../entity/booking.entity';
+import { Booking } from '../entity/booking.entity';
 import { CreateBookingDto } from './booking.dto';
 
 
 @Injectable()
 export class BookingService {
-  constructor(@InjectRepository(Bookings) private readonly bookingRepository: Repository<Bookings>,
+  constructor(@InjectRepository(Booking) private readonly bookingRepository: Repository<Booking>,
     private readonly logger: Logger
   ) {
   }
 
-  async createBooking(data: any, userId: string): Promise<Bookings> {
+  async createBooking(data: any, userId: string): Promise<Booking> {
     const body = data.payload;
     try {
       return await this.bookingRepository
@@ -25,15 +25,37 @@ export class BookingService {
   }
 
 
-  async updateHome(id: string, data: any): Promise<Bookings> {
+  async updateHome(id: string, data: any): Promise<Booking> {
     const body = data.payload;
     const homeFacility = await this.bookingRepository.findOne({ where: { id } });
     const updatedFacility = { ...homeFacility, ...body }
     return await this.bookingRepository.save(updatedFacility)
   }
 
+  async cancelBooking(id: string): Promise<Booking> {
+    const booking = await this.bookingRepository.findOne({ where: { id } });
+    const updatedBooking = { ...booking, status: 'canceled' }
+    // add side effect after cancellation
+    return await this.bookingRepository.save(updatedBooking)
+  }
+  async reserveBooking(id: string): Promise<Booking> {
+    const booking = await this.bookingRepository.findOne({ where: { id } });
+    const updatedBooking = { ...booking, status: 'booked' }
+    // add side effect after cancellation
+    // reserve the number of days for that home from 8 shares
+    return await this.bookingRepository.save(updatedBooking)
+  }
+
+  async completeBooking(id: string): Promise<Booking> {
+    const booking = await this.bookingRepository.findOne({ where: { id } });
+    const updatedBooking = { ...booking, status: 'completed' }
+    // mark complete
+    return await this.bookingRepository.save(updatedBooking)
+  }
+
   async listAll() {
-    return await this.bookingRepository.find({});
+    const data = await this.bookingRepository.find({});
+    return data;
   }
 
   async listAllBookingsForHome(homeId: string) {
@@ -41,6 +63,8 @@ export class BookingService {
   }
 
   async getById(id: string) {
-    return await this.bookingRepository.findOne({ where: { id } });
+    const data = await this.bookingRepository.findOne({ where: { id } });
+    console.log(data);
+    return data;
   }
 }

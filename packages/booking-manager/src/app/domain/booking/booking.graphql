@@ -1,12 +1,12 @@
 scalar Date
 
-type Booking {
+type Booking @key (fields: "id"){
 	id: ID!
 	user: User
 	invoice_id: String!
 	home: Home
-	start_date: String!
-	end_date: String!
+	start_date: Date!
+	end_date: Date!
 	status: String!
   created_at: Date
   updated_at: Date
@@ -22,7 +22,7 @@ extend type User @key(fields: "id") {
 
 type Query {
 	bookings: [Booking!]
-	allHomeBookings(id: ID): [Booking!]
+	allHomeBookings(homeId: ID): [Booking!]
 	booking(id: ID): Booking!
 }
 
@@ -37,4 +37,5 @@ input BookingInput {
 type Mutation {
 	createBooking(payload: BookingInput!): Booking
 	updateBooking(id: ID!, payload: BookingInput!): Booking
+  updateBookingStatus(id: ID!, status: String!): Booking
 }

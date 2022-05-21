@@ -7,6 +7,7 @@ type HomeFacility {
 	display_images: [String!]
 	original_images: [String!]
   id: ID!
+  user: User
   created_at: Date
   updated_at: Date
 }
@@ -19,11 +20,11 @@ type Query {
 input HomeFacilityInput {
 	display_name: String!
   name: String!
+  home_id: String!
 	description: String
 }
 
 type Mutation {
 	createFacility(payload: HomeFacilityInput!): HomeFacility
 	updateFacility(id: ID!, payload: HomeFacilityInput!): HomeFacility
-  addFacilityToHome(facility_id: ID, home_id: ID): Boolean
 }
