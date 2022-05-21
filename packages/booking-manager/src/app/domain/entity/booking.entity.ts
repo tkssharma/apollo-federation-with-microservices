@@ -9,7 +9,7 @@ export enum BookingStatus {
 }
 
 @Entity('bookings')
-export class Bookings extends BaseEntity {
+export class Booking extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 

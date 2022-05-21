@@ -3,10 +3,10 @@ import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { Logger } from '@logger/logger';
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context } from '@nestjs/graphql';
-import { Bookings } from '../entity/booking.entity';
+import { Booking } from '../entity/booking.entity';
 import { BookingService } from './booking.service';
 
-@Resolver((of: any) => Bookings)
+@Resolver((of: any) => Booking)
 export class BookingResolver {
   constructor(private bookingService: BookingService, private readonly logger: Logger) {
   }
@@ -61,14 +61,14 @@ export class BookingResolver {
 
   @ResolveField('home')
   home(@Parent() booking: any) {
-    this.logger.http("ResolveField :: home")
+    this.logger.http("ResolveField :: home" + JSON.stringify(booking));
     return { __typename: 'Home', id: booking.home_id };
   }
 
 
   @ResolveField('user')
   user(@Parent() booking: any) {
-    this.logger.http("ResolveField :: user")
+    this.logger.http("ResolveField :: user" + booking)
     return { __typename: 'User', id: booking.user_id };
   }
 }
