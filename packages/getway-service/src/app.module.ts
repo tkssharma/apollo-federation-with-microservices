@@ -47,6 +47,7 @@ const handleAuth = ({ req }) => {
       };
     }
   } catch (err) {
+    console.log(err);
     throw new BadRequestException();
   }
 };

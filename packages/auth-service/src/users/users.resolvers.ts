@@ -20,26 +20,6 @@ export class UserResolver {
     return await this.usersService.getAllUsers();
   }
 
-  @Query('userLogin')
-  @UseGuards(JwtAuthGuard, UsernameEmailAdminGuard)
-  async userLogin(
-    @Args('username') username?: string,
-    @Args('email') email?: string,
-  ): Promise<UserEntity> {
-    let user: UserEntity | null;
-    if (username) {
-      user = await this.usersService.findOneByUsername(username);
-    } else if (email) {
-      user = await this.usersService.findOneByEmail(email);
-    } else {
-      // Is this the best exception for a graphQL error?
-      throw new ValidationError('A username or email must be included');
-    }
-
-    if (user) return user;
-    throw new UserInputError('The user does not exist');
-  }
-
   // A NotFoundException is intentionally not sent so bots can't search for emails
   @Query('forgotPassword')
   async forgotPassword(@Args('email') email: string): Promise<boolean> {
