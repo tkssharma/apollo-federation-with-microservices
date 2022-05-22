@@ -9,8 +9,8 @@ import { UserInputError, ValidationError } from 'apollo-server-core';
 import { AdminAllowedArgs } from '../decorators/admin-allowed-args';
 import { UserEntity } from './entity/users.entity';
 import { Logger } from 'src/logger/logger';
-import { IsDefined, isEmail, validate, validateSync } from 'class-validator';
 import { UserSignup } from './dto/users.dto';
+import { validate } from 'class-validator';
 
 @Resolver('User')
 export class UserResolver {

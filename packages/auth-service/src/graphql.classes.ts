@@ -38,8 +38,6 @@ export abstract class IQuery {
 
     abstract users(): User[] | Promise<User[]>;
 
-    abstract userLogin(username?: Nullable<string>, email?: Nullable<string>): User | Promise<User>;
-
     abstract user(id: string): User | Promise<User>;
 
     abstract forgotPassword(email?: Nullable<string>): Nullable<boolean> | Promise<Nullable<boolean>>;
