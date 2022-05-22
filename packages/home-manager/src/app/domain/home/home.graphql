@@ -1,4 +1,5 @@
 scalar Date
+scalar Upload
 
 type Home @key (fields: "id"){
     id: ID!
@@ -30,7 +31,10 @@ input HomeInput {
   is_active: Boolean!
 }
 
+
 type Mutation {
     createHome(payload: HomeInput!): Home
     updateHome(id: ID!, payload: HomeInput!): Home
+    uploadProfileImage(file: Upload!): Boolean!
+
 }

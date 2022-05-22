@@ -4,6 +4,7 @@ import {
   BadRequestException,
   HttpStatus,
   HttpException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { IntrospectAndCompose } from '@apollo/gateway';
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
@@ -26,7 +27,6 @@ const getToken = (authToken: string): string => {
 
 const decodeToken = (tokenString: string) => {
   const decoded = verify(tokenString, process.env.SECRET_KEY);
-  console.log(process.env.SECRET_KEY, decoded);
   if (!decoded) {
     throw new HttpException(
       { message: INVALID_AUTH_TOKEN },
@@ -47,8 +47,9 @@ const handleAuth = ({ req }) => {
       };
     }
   } catch (err) {
-    console.log(err);
-    throw new BadRequestException();
+    throw new UnauthorizedException(
+      'User unauthorized with invalid authorization Headers',
+    );
   }
 };
 @Module({

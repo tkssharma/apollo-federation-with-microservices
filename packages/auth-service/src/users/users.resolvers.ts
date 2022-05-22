@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { BadRequestException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver, Context, ResolveReference } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -9,6 +9,8 @@ import { UserInputError, ValidationError } from 'apollo-server-core';
 import { AdminAllowedArgs } from '../decorators/admin-allowed-args';
 import { UserEntity } from './entity/users.entity';
 import { Logger } from 'src/logger/logger';
+import { IsDefined, isEmail, validate, validateSync } from 'class-validator';
+import { UserSignup } from './dto/users.dto';
 
 @Resolver('User')
 export class UserResolver {
@@ -48,7 +50,20 @@ export class UserResolver {
   ): Promise<UserEntity> {
     let createdUser: UserEntity | null;
     try {
-      createdUser = await this.usersService.create(createUserInput);
+      const { email, username, password } = createUserInput;
+      const userSignup = new UserSignup();
+      userSignup.email = email;
+      userSignup.username = username;
+      userSignup.password = password;
+      const errors = await validate(userSignup);
+
+      if (errors.length > 0) {
+        const errorsResponse: any = errors.map((val: any) => {
+          return Object.values(val.constraints)[0] as string
+        })
+        throw new BadRequestException(errorsResponse.join(','))
+      }
+      return await this.usersService.create(createUserInput);
     } catch (error) {
       throw new UserInputError(error.message);
     }
