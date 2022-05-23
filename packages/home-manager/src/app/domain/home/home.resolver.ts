@@ -33,9 +33,39 @@ export class HomeResolver {
   }
 
   @Mutation()
-  async uploadProfileImage(@Args({ name: "file", type: () => GraphQLUpload }) file: FileUpload) {
-    console.log(file);
-    return true;
+  async  uploadHomePhoto(
+    @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
+  ): Promise<number> {
+    try {
+      const { createReadStream } = file;
+      const stream = createReadStream();
+      const chunks: any = [];
+      console.log(stream)
+
+      const buffer = await new Promise<Buffer>((resolve, reject) => {
+        let buffer: Buffer;
+
+        stream.on('data', function (chunk) {
+          chunks.push(chunk);
+        });
+
+        stream.on('end', function () {
+          buffer = Buffer.concat(chunks);
+          resolve(buffer);
+        });
+
+        stream.on('error', reject);
+      });
+      console.log(buffer);
+      const base64 = buffer.toString('base64');
+      // If you want to store the file, this is one way of doing
+      // it, as you have the file in-memory as Buffer
+
+      return base64.length;
+    } catch (err) {
+      console.log(err);
+      return 0;
+    }
   }
 
   @Query()

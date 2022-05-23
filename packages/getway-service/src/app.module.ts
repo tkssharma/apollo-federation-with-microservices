@@ -5,12 +5,14 @@ import {
   HttpStatus,
   HttpException,
   UnauthorizedException,
+  MiddlewareConsumer,
 } from '@nestjs/common';
 import { IntrospectAndCompose } from '@apollo/gateway';
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { verify, decode } from 'jsonwebtoken';
 import { INVALID_AUTH_TOKEN, INVALID_BEARER_TOKEN } from './app.constants';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 const getToken = (authToken: string): string => {
   console.log(authToken);
@@ -82,4 +84,8 @@ const handleAuth = ({ req }) => {
     }),
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(graphqlUploadExpress()).forRoutes('graphql');
+  }
+}

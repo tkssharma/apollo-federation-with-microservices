@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
@@ -18,23 +18,25 @@ import {
 } from '@nestjs/apollo';
 import { FacilityModule } from './facility/facility.module';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
+import { FilesModule } from './files/files.module';
+import { AWSS3Module } from '@app/lib/aws-s3';
+import { UserUploads } from './entity/files.entity';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 @Module({
   imports: [
+    DbModule.forRoot({
+      entities: [HomeLocality, HomeFacility, Home, UserUploads]
+    }),
     LoggerModule,
+    AWSS3Module,
     HomeModule,
+    FilesModule,
     LocalityModule,
     FacilityModule,
-    DbModule.forRoot({
-      entities: [HomeLocality, HomeFacility, Home]
-    }),
     ConfigModule,
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
-      uploads: {
-        maxFileSize: 20000000, // 20 MB
-        maxFiles: 5
-      },
       driver: ApolloFederationDriver,
       context: ({ req }: any) => ({ req }),
       formatError: (error: GraphQLError) => {
@@ -49,5 +51,7 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql';
 })
 
 export class DomainModule {
-
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(graphqlUploadExpress()).forRoutes("graphql");
+  }
 }

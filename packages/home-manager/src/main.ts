@@ -6,10 +6,18 @@ import { graphqlUploadExpress } from 'graphql-upload';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as helmet from 'helmet';
 import { AppModule } from './app/app.module';
+import { config } from "aws-sdk";
+
 import { HttpExceptionFilter } from './app/core/interceptor/app.interceptor';
 import { Logger } from './logger/logger';
 const LISTEN_PORT = 3005;
 
+config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS,
+  region: process.env.AWS_REGION,
+  signatureVersion: "v4",
+});
 
 const NEST_LOGGING = true;
 async function bootstrap() {

@@ -35,6 +35,6 @@ input HomeInput {
 type Mutation {
     createHome(payload: HomeInput!): Home
     updateHome(id: ID!, payload: HomeInput!): Home
-    uploadProfileImage(file: Upload!): Boolean!
+    uploadHomePhoto(file: Upload!): Int!
 
 }

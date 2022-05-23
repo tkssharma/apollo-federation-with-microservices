@@ -12,6 +12,7 @@ import { DbConfig } from './db.interface';
 export class DbModule {
   private static getConnectionOptions(config: ConfigService, dbconfig: DbConfig): TypeOrmModuleOptions {
     const dbdata = config.get().db;
+    console.log(dbdata);
     if (!dbdata) {
       throw new DbConfigError('Database config is mSissing');
     }
