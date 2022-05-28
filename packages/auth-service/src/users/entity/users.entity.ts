@@ -11,14 +11,20 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 500 })
   public password!: string;
 
-  @Column({ type: 'varchar', length: 255, select: true, unique: true })
-  public username!: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  public last_name!: string;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  public first_name!: string;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  public name!: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  public picture_url!: string;
 
   @Column({ type: 'jsonb', default: [] })
   public permissions!: string[];
-
-  @Column({ type: 'varchar', length: 255, select: true })
-  public lowercaseUsername!: string;
 
   @Column({ type: 'varchar', length: 255, select: true })
   public lowercaseEmail!: string;

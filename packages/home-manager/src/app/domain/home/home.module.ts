@@ -7,10 +7,11 @@ import { HomeLocality } from '../entity/home-locality.entity';
 import { LoggerModule } from '@logger/logger.module';
 import { DateScalar } from '@app/scalars/date.scalar';
 import { HomeFacility } from '../entity/home-facility.entity';
+import { AuthModule } from '@app/auth/auth.module';
 
 
 @Module({
-  imports: [LoggerModule, TypeOrmModule.forFeature([Home, HomeLocality, HomeFacility])],
+  imports: [LoggerModule, AuthModule, TypeOrmModule.forFeature([Home, HomeLocality, HomeFacility])],
   providers: [HomeService, HomeResolver, DateScalar],
 })
 export class HomeModule {

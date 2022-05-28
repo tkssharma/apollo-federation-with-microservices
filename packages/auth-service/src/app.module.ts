@@ -11,6 +11,7 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
+import { GraphQLError, GraphQLFormattedError } from 'graphql';
 
 @Module({
   imports: [
@@ -23,6 +24,12 @@ import {
       typePaths: ['./**/*.graphql'],
       driver: ApolloFederationDriver,
       context: ({ req }: any) => ({ req }),
+      formatError: (error: GraphQLError) => {
+        const graphQLFormattedError: GraphQLFormattedError = {
+          message: error?.extensions?.exception?.response?.message || error?.message,
+        };
+        return graphQLFormattedError;
+      },
       definitions: {
         path: join(process.cwd(), 'src/graphql.classes.ts'),
         outputAs: 'class',

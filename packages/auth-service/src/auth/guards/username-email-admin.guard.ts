@@ -12,7 +12,7 @@ export class UsernameEmailAdminGuard implements CanActivate {
   constructor(
     private usersService: UsersService,
     private readonly reflector: Reflector,
-  ) {}
+  ) { }
 
   // Returns an array of all the properties of an object seperated by a .
   getPropertiesArray(object: any): string[] {
@@ -36,19 +36,9 @@ export class UsernameEmailAdminGuard implements CanActivate {
     const request = ctx.getContext().req;
     let shouldActivate = false;
     if (request.user) {
-      const user = <User> request.user;
+      const user = <User>request.user;
       const args = ctx.getArgs();
-      if (args.username && typeof args.username === 'string') {
-        shouldActivate =
-          args.username.toLowerCase() === user.username.toLowerCase();
-      } else if (args.email && typeof args.email === 'string') {
-        shouldActivate = args.email.toLowerCase() === user.email.toLowerCase();
-      } else if (!args.username && !args.email) {
-        shouldActivate = true;
-      }
-
       if (
-        shouldActivate === false &&
         this.usersService.isAdmin(user.permissions)
       ) {
         const adminAllowedArgs = this.reflector.get<string[]>(

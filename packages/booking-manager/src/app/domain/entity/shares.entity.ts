@@ -19,7 +19,7 @@ export enum ShareStatus {
 }
 
 @Entity({ name: 'home_shares' })
-export class HomeShares extends BaseEntity {
+export class Share extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
@@ -34,7 +34,7 @@ export class HomeShares extends BaseEntity {
     enum: ShareStatus,
     default: ShareStatus.active,
   })
-  public status!: string;
+  public status!: ShareStatus;
 
   @Column({ type: 'uuid' })
   public home_id!: string;

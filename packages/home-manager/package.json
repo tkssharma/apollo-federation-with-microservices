@@ -61,8 +61,10 @@
     "@nestjs/swagger": "^5.1.5",
     "@nestjs/terminus": "^8.0.6",
     "@nestjs/typeorm": "^8.0.2",
+    "@profusion/apollo-federation-upload": "^4.0.0",
     "apollo-server-core": "^3.7.0",
     "apollo-server-express": "^2.25.2",
+    "aws-sdk": "^2.1140.0",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "debug": "^4.3.3",
@@ -72,6 +74,7 @@
     "graphql": "^15.8.0",
     "graphql-tool": "^1.0.0",
     "graphql-tools": "^8.2.8",
+    "graphql-upload": "^11.0.0",
     "helmet": "^4.6.0",
     "joi": "^17.6.0",
     "module-alias": "^2.2.2",
@@ -89,6 +92,10 @@
     "winston": "^3.7.2",
     "yamljs": "^0.3.0"
   },
+  "resolutions": {
+    "**/**/fs-capacitor": "^6.2.0",
+    "**/graphql-upload": "^11.0.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "^16.2.1",
     "@commitlint/config-conventional": "^16.2.1",
@@ -98,6 +105,7 @@
     "@types/debug": "^4.1.7",
     "@types/express": "^4.17.13",
     "@types/graphql": "^14.5.0",
+    "@types/graphql-upload": "^8.0.11",
     "@types/jest": "^27.0.2",
     "@types/joi": "^17.2.3",
     "@types/moment": "^2.13.0",

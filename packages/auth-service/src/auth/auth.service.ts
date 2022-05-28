@@ -43,6 +43,51 @@ export class AuthService {
     // Check the supplied password against the hash stored for this email address
     let isMatch = false;
     try {
+      isMatch = await this.comparePassword(loginAttempt.password, userToAttempt?.password);
+    } catch (error) {
+      console.log(error);
+      return undefined;
+    }
+
+    if (isMatch) {
+      // If there is a successful match, generate a JWT for the user
+      const token = this.createJwt(userToAttempt!).token;
+      const result: any = {
+        user: userToAttempt!,
+        token,
+      };
+      userToAttempt.updated_at = new Date();
+      userToAttempt.save();
+      return result;
+    }
+    return null;
+  }
+
+  /**
+ * Checks if a user's password is valid
+ *
+ * @param {LoginUserInput} loginAttempt Include username or email. If both are provided only
+ * username will be used. Password must be provided.
+ * @returns {(Promise<LoginResult | undefined>)} returns the User and token if successful, undefined if not
+ * @memberof AuthService
+ */
+  async validateUserById(
+    loginAttempt: { id: string, password: string },
+  ): Promise<LoginResult | undefined> {
+    console.log(loginAttempt)
+
+    // This will be used for the initial login
+    let userToAttempt: UserEntity | undefined;
+    if (loginAttempt.id) {
+      userToAttempt = await this.usersService.findOneByUserId(
+        loginAttempt.id,
+      );
+
+    }
+
+    // Check the supplied password against the hash stored for this email address
+    let isMatch = false;
+    try {
       isMatch = await this.comparePassword(loginAttempt.password, userToAttempt.password);
     } catch (error) {
       console.log(error);
@@ -79,7 +124,7 @@ export class AuthService {
     payload: JwtPayload,
   ): Promise<UserEntity | undefined> {
     // This will be used when the user has already logged in and has a JWT
-    const user = await this.usersService.findOneByUsername(payload.username);
+    const user = await this.usersService.findOneByEmail(payload.email);
 
     // Ensure the user exists and their account isn't disabled
     if (user) {
@@ -109,7 +154,7 @@ export class AuthService {
     }
     const data: JwtPayload = {
       userId: user.id,
-      username: user.username,
+      email: user.email,
       permissions: user.permissions,
       expiration,
     };

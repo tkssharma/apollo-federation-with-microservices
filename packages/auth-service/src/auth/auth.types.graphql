@@ -9,7 +9,6 @@ type LoginResult {
 }
 
 input LoginUserInput {
-  username: String
-  email: String
+  email: String!
   password: String!
 }

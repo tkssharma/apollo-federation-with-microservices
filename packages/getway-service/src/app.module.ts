@@ -4,15 +4,18 @@ import {
   BadRequestException,
   HttpStatus,
   HttpException,
+  UnauthorizedException,
+  MiddlewareConsumer,
 } from '@nestjs/common';
 import { IntrospectAndCompose } from '@apollo/gateway';
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { verify, decode } from 'jsonwebtoken';
 import { INVALID_AUTH_TOKEN, INVALID_BEARER_TOKEN } from './app.constants';
+import { graphqlUploadExpress } from 'graphql-upload';
+import FileUploadDataSource from '@profusion/apollo-federation-upload';
 
 const getToken = (authToken: string): string => {
-  console.log(authToken);
   const match = authToken.match(/^Bearer (.*)$/);
   if (!match || match.length < 2) {
     throw new HttpException(
@@ -20,13 +23,11 @@ const getToken = (authToken: string): string => {
       HttpStatus.UNAUTHORIZED,
     );
   }
-  console.log(match[1]);
   return match[1];
 };
 
 const decodeToken = (tokenString: string) => {
   const decoded = verify(tokenString, process.env.SECRET_KEY);
-  console.log(process.env.SECRET_KEY, decoded);
   if (!decoded) {
     throw new HttpException(
       { message: INVALID_AUTH_TOKEN },
@@ -40,6 +41,9 @@ const handleAuth = ({ req }) => {
     if (req.headers.authorization) {
       const token = getToken(req.headers.authorization);
       const decoded: any = decodeToken(token);
+      console.log(
+        `userId: ${decoded.userId} permissions: ${decoded.permissions}`,
+      );
       return {
         userId: decoded.userId,
         permissions: decoded.permissions,
@@ -47,7 +51,9 @@ const handleAuth = ({ req }) => {
       };
     }
   } catch (err) {
-    throw new BadRequestException();
+    throw new UnauthorizedException(
+      'User unauthorized with invalid authorization Headers',
+    );
   }
 };
 @Module({
@@ -58,17 +64,17 @@ const handleAuth = ({ req }) => {
       },
       driver: ApolloGatewayDriver,
       gateway: {
-        buildService: ({ name, url }) => {
-          return new RemoteGraphQLDataSource({
+        buildService: ({ url }) =>
+          new FileUploadDataSource({
             url,
+            useChunkedTransfer: true,
             willSendRequest({ request, context }: any) {
               request.http.headers.set('userId', context.userId);
               // for now pass authorization also
               request.http.headers.set('authorization', context.authorization);
               request.http.headers.set('permissions', context.permissions);
             },
-          });
-        },
+          }),
         supergraphSdl: new IntrospectAndCompose({
           subgraphs: [
             { name: 'User', url: 'http://localhost:5006/graphql' },
@@ -80,4 +86,8 @@ const handleAuth = ({ req }) => {
     }),
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(graphqlUploadExpress()).forRoutes('graphql');
+  }
+}

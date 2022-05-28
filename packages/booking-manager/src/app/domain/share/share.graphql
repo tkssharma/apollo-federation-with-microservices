@@ -1,0 +1,46 @@
+scalar Date
+
+type Share @key (fields: "id"){
+	id: ID!
+	user: User
+	home: Home
+	quantity: Float!
+	status: String!
+  created_at: Date
+  updated_at: Date
+}
+
+extend type Home @key(fields: "id") {
+  id: ID! @external
+}
+
+extend type User @key(fields: "id") {
+  id: ID! @external
+}
+type SharesForCustomer {
+  user: User!
+  shares: [Share!]
+}
+type CustomersForHome {
+  home: Home,
+  customers: [User!]
+}
+
+type Query {
+	shares: [Share!]
+	share(id: ID): [Share!]
+  getAllShareForCustomer(id: ID): SharesForCustomer!
+  getAllCustomersForHome(id:ID): CustomersForHome!
+}
+
+input buyShareInput {
+	home_id: String!
+	user_id: String!
+	quantity: Float!
+}
+
+type Mutation {
+	buyCustomerShareForHome(payload: buyShareInput!): Share
+  removeCustomerShareForHome(payload: buyShareInput!): Share
+	updateCustomerShareForHome(payload: buyShareInput!): Share
+}

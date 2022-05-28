@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput, UpdateUserInput } from '../graphql.classes';
+import { CreateUserInput, FindUserInput, UpdateUserInput } from '../graphql.classes';
 import { randomBytes } from 'crypto';
 import { createTransport, SendMailOptions } from 'nodemailer';
 import { ConfigService } from '../config/config.service';
 import { AuthService } from '../auth/auth.service';
 import { UserEntity } from './entity/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -32,16 +32,16 @@ export class UsersService {
    * before adding it.
    *
    * @param {string} permission The permission to add to the user
-   * @param {string} username The user's username
+   * @param {string} email The user's username
    * @returns {(Promise<UserEntity | undefined>)} The user Document with the updated permission. Undefined if the
    * user does not exist
    * @memberof UsersService
    */
   async addPermission(
     permission: string,
-    username: string,
+    email: string,
   ): Promise<UserEntity | undefined> {
-    const user = await this.findOneByUsername(username);
+    const user = await this.findOneByEmail(email);
     if (!user) return null;
     if (user.permissions.includes(permission)) return user;
     user.permissions.push(permission);
@@ -53,15 +53,15 @@ export class UsersService {
    * Removes any permission string from the user's permissions array property.
    *
    * @param {string} permission The permission to remove from the user
-   * @param {string} username The username of the user to remove the permission from
+   * @param {string} email The email of the user to remove the permission from
    * @returns {(Promise<UserEntity | undefined>)} Returns undefined if the user does not exist
    * @memberof UsersService
    */
   async removePermission(
     permission: string,
-    username: string,
+    email: string,
   ): Promise<UserEntity | undefined> {
-    const user = await this.findOneByUsername(username);
+    const user = await this.findOneByEmail(email);
     if (!user) return undefined;
     user.permissions = user.permissions.filter(
       userPermission => userPermission !== permission,
@@ -71,39 +71,33 @@ export class UsersService {
   }
 
   /**
-   * Updates a user in the database. If any value is invalid, it will still update the other
-   * fields of the user.
-   *
-   * @param {string} username of the user to update
-   * @param {UpdateUserInput} fieldsToUpdate The user can update their username, email, password, or enabled. If
-   * the username is updated, the user's token will no longer work. If the user disables their account, only an admin
-   * can reenable it
-   * @returns {(Promise<UserEntity | undefined>)} Returns undefined if the user cannot be found
-   * @memberof UsersService
-   */
-  async update(
-    username: string,
+ * Updates a user in the database. If any value is invalid, it will still update the other
+ * fields of the user.
+ *
+ * @param {string} email of the user to update
+ * @param {UpdateUserInput} fieldsToUpdate The user can update their email, password, or enabled. If
+ * the email is updated, the user's token will no longer work. If the user disables their account, only an admin
+ * can reenable it
+ * @returns {(Promise<UserEntity | undefined>)} Returns undefined if the user cannot be found
+ * @memberof UsersService
+ */
+  async updateById(
+    id: string,
     fieldsToUpdate: UpdateUserInput,
   ): Promise<UserEntity | undefined> {
-    if (fieldsToUpdate.username) {
-      const duplicateUser = await this.findOneByUsername(
-        fieldsToUpdate.username,
-      );
-      if (duplicateUser) fieldsToUpdate.username = undefined;
-    }
 
     if (fieldsToUpdate.email) {
       const duplicateUser = await this.findOneByEmail(fieldsToUpdate.email);
-      // const emailValid = UserModel.validateEmail(fieldsToUpdate.email);
-      if (duplicateUser  /* ||!emailValid*/) fieldsToUpdate.email = undefined;
+      if (duplicateUser)
+        fieldsToUpdate.email = undefined;
     }
 
     const fields: any = {};
 
     if (fieldsToUpdate.password) {
       if (
-        await this.authService.validateUserByPassword({
-          username,
+        await this.authService.validateUserById({
+          id,
           password: fieldsToUpdate.password.oldPassword,
         })
       ) {
@@ -121,17 +115,72 @@ export class UsersService {
     let user: UserEntity | undefined | null = null;
 
     if (Object.entries(fieldsToUpdate).length > 0) {
-      user = await this.findOneByUsername(username.toLowerCase());
-      if (fields.username) {
-        fields.lowercaseUsername = fields.username.toLowerCase();
-      }
+      user = await this.findOneByUserId(id);
       if (fields.email) {
         fields.lowercaseEmail = fields.email.toLowerCase();
       }
       const saveEntity = { ...user, ...fields };
       await this.userRepo.save(saveEntity)
     }
-    user = await this.findOneByUsername(username);
+    user = await this.findOneByUserId(id);
+    if (!user) return null;
+
+    return user;
+  }
+
+  /**
+   * Updates a user in the database. If any value is invalid, it will still update the other
+   * fields of the user.
+   *
+   * @param {string} email of the user to update
+   * @param {UpdateUserInput} fieldsToUpdate The user can update their email, password, or enabled. If
+   * the email is updated, the user's token will no longer work. If the user disables their account, only an admin
+   * can reenable it
+   * @returns {(Promise<UserEntity | undefined>)} Returns undefined if the user cannot be found
+   * @memberof UsersService
+   */
+  async update(
+    email: string,
+    fieldsToUpdate: UpdateUserInput,
+  ): Promise<UserEntity | undefined> {
+
+    if (fieldsToUpdate.email) {
+      const duplicateUser = await this.findOneByEmail(fieldsToUpdate.email);
+      if (duplicateUser)
+        fieldsToUpdate.email = undefined;
+    }
+
+    const fields: any = {};
+
+    if (fieldsToUpdate.password) {
+      if (
+        await this.authService.validateUserByPassword({
+          email,
+          password: fieldsToUpdate.password.oldPassword,
+        })
+      ) {
+        fields.password = fieldsToUpdate.password.newPassword;
+      }
+    }
+
+    // Remove undefined keys for update
+    for (const key in fieldsToUpdate) {
+      if (typeof fieldsToUpdate[key] !== 'undefined' && key !== 'password') {
+        fields[key] = fieldsToUpdate[key];
+      }
+    }
+
+    let user: UserEntity | undefined | null = null;
+
+    if (Object.entries(fieldsToUpdate).length > 0) {
+      user = await this.findOneByEmail(email.toLowerCase());
+      if (fields.email) {
+        fields.lowercaseEmail = fields.email.toLowerCase();
+      }
+      const saveEntity = { ...user, ...fields };
+      await this.userRepo.save(saveEntity)
+    }
+    user = await this.findOneByEmail(email);
     if (!user) return null;
 
     return user;
@@ -154,18 +203,6 @@ export class UsersService {
 
     // One day for expiration of reset token
     const expiration = new Date(Date().valueOf() + 24 * 60 * 60 * 1000);
-
-    // use send-grid and send email
-    // ! TBD 
-
-    /* const mailOptions: SendMailOptions = {
-       from: this.configService.emailFrom,
-       to: email,
-       subject: `Reset Password`,
-       text: `${user.username},
-       Replace this with a website that can pass the token:
-       ${token}`,
-     }; */
 
     return new Promise(resolve => {
       /*transporter.sendMail(mailOptions, (err, info) => {
@@ -190,18 +227,18 @@ export class UsersService {
   /**
    * Resets a password after the user forgot their password and requested a reset
    *
-   * @param {string} username
+   * @param {string} email
    * @param {string} code the token set when the password reset email was sent out
    * @param {string} password the new password the user wants
    * @returns {(Promise<UserEntity | undefined>)} Returns undefined if the code or the username is wrong
    * @memberof UsersService
    */
   async resetPassword(
-    username: string,
+    email: string,
     code: string,
     password: string,
   ): Promise<UserEntity | undefined> {
-    const user = await this.findOneByUsername(username);
+    const user = await this.findOneByEmail(email);
     if (user && user.passwordReset) {
       if (user.passwordReset.token === code) {
         user.password = await this.hashPassword(password);
@@ -229,7 +266,8 @@ export class UsersService {
       ...userEntity,
       ...createUserInput,
       password: pass,
-      lowercaseUsername: createUserInput.username.toLowerCase(),
+      first_name: createUserInput?.first_name?.toLowerCase(),
+      last_name: createUserInput?.last_name?.toLowerCase(),
       lowercaseEmail: createUserInput.email.toLowerCase()
     };
 
@@ -281,18 +319,6 @@ export class UsersService {
     return null;
   }
 
-  /**
-   * Returns a user by their unique username or undefined
-   *
-   * @param {string} username of user, not case sensitive
-   * @returns {(Promise<UserEntity | undefined>)}
-   * @memberof UsersService
-   */
-  async findOneByUsername(username: string): Promise<UserEntity | undefined> {
-    const user = await this.userRepo
-      .findOne({ where: { lowercaseUsername: username.toLowerCase() } })
-    if (user) { return user; }
-  }
 
   /**
    * Gets all the users that are registered
@@ -302,6 +328,27 @@ export class UsersService {
    */
   async getAllUsers(): Promise<UserEntity[]> {
     const users = await this.userRepo.find({});
+    return users;
+  }
+
+
+  /**
+ * Gets all the users that are registered with search
+ *
+ * @returns {Promise<UserEntity[]>}
+ * @memberof UsersService
+ */
+  async findUsers(input: FindUserInput): Promise<UserEntity[]> {
+    console.log(input)
+    const { name, email, first_name, last_name } = input
+    const users = await this.userRepo.find({
+      where: [
+        { name: Like(`%${name}%`) },
+        { email: Like(`%${email}%`) },
+        { first_name: Like(`%${first_name}%`) },
+        { last_name: Like(`%${last_name}%`) },
+      ]
+    });
     return users;
   }
 
@@ -331,7 +378,7 @@ export class UsersService {
     createUserInput: CreateUserInput,
   ): Error {
     throw new Error(
-      `Username ${createUserInput.username} is already registered`,
+      `Username ${createUserInput.email} is already registered`,
     );
   }
 }

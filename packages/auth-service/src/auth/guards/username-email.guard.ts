@@ -9,21 +9,18 @@ import { AuthenticationError } from 'apollo-server-core';
 // or if the user is admin
 @Injectable()
 export class UsernameEmailGuard implements CanActivate {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) { }
 
   canActivate(context: ExecutionContext): boolean {
     const ctx = GqlExecutionContext.create(context);
     const request = ctx.getContext().req;
     let shouldActivate = false;
     if (request.user) {
-      const user = <User> request.user;
+      const user = <User>request.user;
       const args = ctx.getArgs();
-      if (args.username && typeof args.username === 'string') {
-        shouldActivate =
-          args.username.toLowerCase() === user.username.toLowerCase();
-      } else if (args.email && typeof args.email === 'string') {
+      if (args.email && typeof args.email === 'string') {
         shouldActivate = args.email.toLowerCase() === user.email.toLowerCase();
-      } else if (!args.username && !args.email) {
+      } else if  (!args.email) {
         shouldActivate = true;
       }
     }
