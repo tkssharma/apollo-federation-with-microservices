@@ -2,10 +2,11 @@ scalar Date
 
 type Share @key (fields: "id"){
 	id: ID!
-	user: User
 	home: Home
-	quantity: Float!
-	status: String!
+  price: Float
+	initial_price: Float
+  count: Float
+	is_available: String!
   created_at: Date
   updated_at: Date
 }
@@ -17,30 +18,43 @@ extend type Home @key(fields: "id") {
 extend type User @key(fields: "id") {
   id: ID! @external
 }
-type SharesForCustomer {
-  user: User!
-  shares: [Share!]
-}
-type CustomersForHome {
-  home: Home,
-  customers: [User!]
+type HomeCount {
+  count: Float
 }
 
 type Query {
 	shares: [Share!]
 	share(id: ID): [Share!]
-  getAllShareForCustomer(id: ID): SharesForCustomer!
-  getAllCustomersForHome(id:ID): CustomersForHome!
+  getAllShareForHome(homeId: ID): [Share!]
+  getActiveShareCountForHome(homeId:ID): HomeCount!
 }
 
-input buyShareInput {
+input ShareInput {
 	home_id: String!
-	user_id: String!
-	quantity: Float!
+  price: Float
+	initial_price: Float
+}
+
+input UpdateShareInput {
+	home_id: String!
+  share_id: String!
+  price: Float
+	initial_price: Float
+}
+
+input RemoveShareInput {
+	home_id: String!
+  share_ids: [String!]!
+}
+
+input AddNewShareInput {
+	home_id: String!
+  share_id: String!
 }
 
 type Mutation {
-	buyCustomerShareForHome(payload: buyShareInput!): Share
-  removeCustomerShareForHome(payload: buyShareInput!): Share
-	updateCustomerShareForHome(payload: buyShareInput!): Share
+	createShareForHome(payload: ShareInput!): Share
+  addNewShareForHome(payload: AddNewShareInput!): Share
+  updateShareForHome(payload: UpdateShareInput!): Share
+	removeSharesForHome(payload: RemoveShareInput!):  Boolean!
 }

@@ -12,26 +12,35 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum ShareStatus {
+  active = 'active',
+  review = 'review',
+  in_active = 'in-active'
+}
 
-@Entity({ name: 'shares' })
-export class Share extends BaseEntity {
+@Entity({ name: 'home_shares' })
+export class HomeShare extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
-  @Column({ type: 'boolean', nullable: true, default: true })
-  public is_available!: boolean;
+  @Column({ type: 'varchar', nullable: true })
+  public note!: string;
 
-  @Column({ type: 'integer', nullable: false })
-  public price!: number;
-
-  @Column({ type: 'integer', nullable: false })
-  public initial_price!: number;
+  @Column({
+    type: 'enum',
+    enum: ShareStatus,
+    default: ShareStatus.active,
+  })
+  public status!: ShareStatus;
 
   @Column({ type: 'uuid' })
   public home_id!: string;
 
-  @Column({ type: 'jsonb', nullable: true })
-  public metadata!: any;
+  @Column({ type: 'uuid' })
+  public share_id!: string;
+
+  @Column({ type: 'uuid' })
+  public user_id!: string;
 
   @Column({ type: 'varchar', nullable: true })
   public created_by!: string;

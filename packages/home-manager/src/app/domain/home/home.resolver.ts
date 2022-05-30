@@ -42,40 +42,43 @@ curl http://localhost:5002/graphql \
   {"correlationId":"da2434d3-8690-448e-8548-3117c860bb61","level":"error","message":"[Fri May 27 13:30:52 2022] [error] Missing multipart field ‘operations’ (https://github.com/jaydenseric/graphql-multipart-request-spec)."}
   */
   @Mutation()
+  @UseGuards(JwtAuthGuard)
   async uploadHomePhoto(
-    @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
+    @Context() context: any
   ): Promise<{ id: number }> {
-    try {
-      console.log(file)
-      const { createReadStream } = file;
-      const stream = createReadStream();
-      const chunks: any = [];
-      console.log(stream)
-
-      const buffer = await new Promise<Buffer>((resolve, reject) => {
-        let buffer: Buffer;
-
-        stream.on('data', function (chunk) {
-          chunks.push(chunk);
-        });
-
-        stream.on('end', function () {
-          buffer = Buffer.concat(chunks);
-          resolve(buffer);
-        });
-
-        stream.on('error', reject);
-      });
-      console.log(buffer);
-      const base64 = buffer.toString('base64');
-      // If you want to store the file, this is one way of doing
-      // it, as you have the file in-memory as Buffer
-
-      return { id: base64.length }
-    } catch (err) {
-      console.log(err);
-      return { id: 0 };
-    }
+    // try {
+    this.logger.http(context)
+    console.log(context.req.body)
+    /* const { createReadStream } = file;
+     const stream = createReadStream();
+     const chunks: any = [];
+     console.log(stream)
+ 
+     const buffer = await new Promise<Buffer>((resolve, reject) => {
+       let buffer: Buffer;
+ 
+       stream.on('data', function (chunk) {
+         chunks.push(chunk);
+       });
+ 
+       stream.on('end', function () {
+         buffer = Buffer.concat(chunks);
+         resolve(buffer);
+       });
+ 
+       stream.on('error', reject);
+     });
+     console.log(buffer);
+     const base64 = buffer.toString('base64');
+     // If you want to store the file, this is one way of doing
+     // it, as you have the file in-memory as Buffer
+ 
+     return { id: base64.length }
+   } catch (err) {
+     console.log(err);
+     return { id: 0 };
+   } */
+    return { id: 0 };
   }
 
   @Query()

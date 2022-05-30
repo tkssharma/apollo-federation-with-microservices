@@ -2,7 +2,7 @@ import { AdminGuard } from '@app/auth/guards/admin.guard';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { Logger } from '@logger/logger';
 import { UseGuards } from '@nestjs/common';
-import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Parent, ResolveField, Context, ResolveReference } from '@nestjs/graphql';
 import { Share } from '../entity/shares.entity';
 import { ShareDto } from './share.dto';
 import { ShareService } from './share.service';
@@ -28,45 +28,49 @@ export class ShareResolver {
 
   @Query()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async getAllShareForCustomer(@Args('id') userId: string) {
-    return await this.service.getAllShareForCustomer(userId);
+  async getAllShareForHome(@Args('homeId') homeId: string) {
+    return await this.service.getAllShareForHome(homeId);
   }
 
   @Query()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async getAllCustomersForHome(@Args('id') homeId: string) {
-    return await this.service.getAllCustomersForHome(homeId);
-  }
-
-
-  @Mutation()
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  async removeCustomerShareForHome(@Args('payload') buyShareInput: ShareDto) {
-    return await this.service.removeCustomerShareForHome(buyShareInput);
+  async getActiveShareCountForHome(@Args('homeId') homeId: string) {
+    return await this.service.getActiveShareCountForHome(homeId);
   }
 
   @Mutation()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async updateCustomerShareForHome(@Args('payload') updateShareInput: ShareDto) {
-    return await this.service.updateCustomerShareForHome(updateShareInput);
+  async createShareForHome(@Args('payload') shareInput: ShareDto) {
+    return await this.service.createShareForHome(shareInput);
   }
 
   @Mutation()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async buyCustomerShareForHome(@Args('payload') buyShareInput: ShareDto) {
-    return await this.service.buyCustomerShareForHome(buyShareInput);
+  async addNewShareForHome(@Args('payload') addNewShareInput: ShareDto) {
+    return await this.service.addNewShareForHome(addNewShareInput);
   }
 
+  @Mutation()
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async updateShareForHome(@Args('payload') updateShareInput: ShareDto) {
+    return await this.service.updateShareForHome(updateShareInput);
+  }
 
+  @Mutation()
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async removeSharesForHome(@Args('payload') removeShareInput: ShareDto) {
+    return await this.service.removeSharesForHome(removeShareInput);
+  }
+
+  @ResolveReference()
+  async resolveReference(reference: { __typename: string; id: string }) {
+    this.logger.http("ResolveReference :: share")
+    return await this.service.getById(reference.id);
+  }
 
   @ResolveField('home')
   home(@Parent() share: any) {
     return { __typename: 'Home', id: share.home_id };
   }
 
-
-  @ResolveField('user')
-  user(@Parent() share: any) {
-    return { __typename: 'User', id: share.user_id };
-  }
 }

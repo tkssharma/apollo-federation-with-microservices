@@ -35,10 +35,8 @@ type uploadRes {
   id : Float!
 }
 
-
 type Mutation {
     createHome(payload: HomeInput!): Home
     updateHome(id: ID!, payload: HomeInput!): Home
     uploadHomePhoto(file: Upload!): uploadRes!
-
 }

@@ -1,9 +1,11 @@
 import { Logger } from '@logger/logger';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { weekdays } from 'moment';
 
-import { Repository } from 'typeorm';
-import { Share, ShareStatus } from '../entity/shares.entity';
+import { createQueryBuilder, In, Repository } from 'typeorm';
+import { ShareStatus } from '../entity/home-shares.entity';
+import { Share } from '../entity/shares.entity';
 import { ShareDto } from './share.dto';
 
 
@@ -14,50 +16,69 @@ export class ShareService {
   ) {
   }
 
-  async buyCustomerShareForHome(data: ShareDto): Promise<Share> {
+  async createShareForHome(data: ShareDto): Promise<Share> {
+    return await this.shareRepository.save(data)
+  }
+
+  async addNewShareForHome(data: any): Promise<Share> {
     try {
-      const { user_id, home_id, quantity } = data;
-      const currentShares = await this.shareRepository.findOne({ where: { user_id, home_id } });
+      const { home_id, share_id } = data;
+      const currentShares = await this.shareRepository.findOne({ where: { home_id, id: share_id } });
       if (currentShares) {
-        throw new ConflictException('Shares already assigned for this Customer, only update shares allowed')
+        return await this.shareRepository.save(
+          {
+            home_id: data.home_id,
+            price: data.price,
+            metadata: currentShares.metadata,
+            initial_price: data.initial_price
+          }
+        )
       }
-      return await this.shareRepository
-        .save({ ...data });
-    } catch (err: any) {
-      this.logger.error(err);
+      throw new NotFoundException('We don not have saved shares for this Home')
+    } catch (err) {
+      throw err;
+    }
+  }
+  async updateShareForHome(data: any): Promise<Share> {
+    try {
+      const { home_id, share_id } = data;
+      const currentShares = await this.shareRepository.findOne({ where: { home_id, id: share_id } });
+      if (currentShares) {
+        return await this.shareRepository.save(
+          {
+            ...currentShares,
+            ...data
+          }
+        )
+      }
+      throw new NotFoundException('We don not have saved shares for this Home')
+    } catch (err) {
+      throw err;
+    }
+  }
+  async removeSharesForHome(data: any): Promise<Share | boolean> {
+    try {
+      const { home_id, share_ids } = data;
+      const currentShares = await this.shareRepository.find({ where: { home_id, id: In(share_ids) } });
+      if (currentShares && currentShares.length > 0) {
+        for (const share of currentShares) {
+          await this.shareRepository.delete(share.id)
+        }
+      }
+      return true;
+    } catch (err) {
       throw err;
     }
   }
 
-  async updateCustomerShareForHome(data: ShareDto): Promise<Share> {
-    const { user_id, home_id, quantity } = data;
-    const currentShares = await this.shareRepository.findOne({ where: { user_id, home_id } });
-    if (currentShares) {
-      currentShares.quantity = quantity
-      return await this.shareRepository.save(currentShares)
-    }
-    throw new NotFoundException()
-  }
+  async getAllShareForHome(homeId: string) {
+    return await this.shareRepository.find({ where: { home_id: homeId } });
 
-  async removeCustomerShareForHome(data: ShareDto): Promise<Share> {
-    const { user_id, home_id, quantity } = data;
-    const currentShares = await this.shareRepository.findOne({ where: { user_id, home_id } });
-    if (currentShares) {
-      currentShares.quantity = 0;
-      currentShares.status = ShareStatus.in_active
-      return await this.shareRepository.save(currentShares)
-    }
-    throw new NotFoundException()
   }
-
-  async getAllShareForCustomer(id: string) {
-    const data = await this.shareRepository.findOne({ where: { user_id: id } });
-    return { shares: data };
-  }
-
-  async getAllCustomersForHome(id: string) {
-    const data = await this.shareRepository.findOne({ where: { home_id: id } });
-    return { customers: data };
+  async getActiveShareCountForHome(homeId: string) {
+    const count = (await this.shareRepository.find({ where: { home_id: homeId } })).length;
+    console.log(count)
+    return { count }
   }
 
   async getById(id: string) {

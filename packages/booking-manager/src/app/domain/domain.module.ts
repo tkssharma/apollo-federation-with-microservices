@@ -13,15 +13,19 @@ import {
 } from '@nestjs/apollo';
 import { BookingModule } from './booking/booking.module';
 import { GraphQLError } from 'graphql';
-import { HomeSharesModule } from './share/share.module';
 import { Share } from './entity/shares.entity';
+import { HomeSharesModule } from './home-share/home-share.module';
+import { SharesModule } from './share/share.module';
+import { HomeShare } from './entity/home-shares.entity';
 @Module({
   imports: [
     BookingModule,
     HomeSharesModule,
+    SharesModule,
     DbModule.forRoot({
-      entities: [Share, Booking]
+      entities: [Share, Booking, HomeShare]
     }),
+
     AuthModule,
     ConfigModule,
     GraphQLModule.forRoot({

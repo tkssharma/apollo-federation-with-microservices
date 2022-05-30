@@ -39,7 +39,9 @@ import { graphqlUploadExpress } from 'graphql-upload';
       typePaths: ['./**/*.graphql'],
       uploads: false,
       driver: ApolloFederationDriver,
-      context: ({ req }: any) => ({ req }),
+      context: ({ req }: any) => {
+        return { req }
+      },
       formatError: (error: GraphQLError) => {
         console.log(error);
         const graphQLFormattedError: GraphQLFormattedError = {

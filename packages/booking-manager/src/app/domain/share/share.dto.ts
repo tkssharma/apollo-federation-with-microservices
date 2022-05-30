@@ -1,7 +1,8 @@
-import { BookingStatus } from "../entity/booking.entity";
 
 export class ShareDto {
+  public price!: number;
+  public initial_price!: number;
+  public metadata: any;
   public home_id!: string;
-  public user_id!: string;
-  public quantity!: number;
+  public created_by!: string;
 }

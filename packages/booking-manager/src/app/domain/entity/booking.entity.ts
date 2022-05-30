@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, CreateDa
 export enum BookingStatus {
   reserved = 'reserved',
   booked = 'booked',
-  canceled = 'canceled',
+  cancelled = 'cancelled',
   completed = 'completed'
 }
 
@@ -35,6 +35,8 @@ export class Booking extends BaseEntity {
   })
   public status!: string;
 
+  @Column({ type: 'integer', nullable: true, default: 0 })
+  public shares?: string;
 
   @Column({ type: 'varchar', nullable: true })
   public note?: string;

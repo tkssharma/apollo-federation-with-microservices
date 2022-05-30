@@ -10,6 +10,7 @@ type Booking @key (fields: "id"){
 	status: String!
   created_at: Date
   updated_at: Date
+  shares: Float!
 }
 
 extend type Home @key(fields: "id") {
@@ -22,20 +23,29 @@ extend type User @key(fields: "id") {
 
 type Query {
 	bookings: [Booking!]
-	allHomeBookings(homeId: ID): [Booking!]
 	booking(id: ID): Booking!
+  getAllCustomerBookings(customerId: ID): [Booking!]
 }
 
-input BookingInput {
+input CreateBookingInput {
 	invoice_id: String!
+  user_id: String!
 	home_id: String!
 	start_date: String!
 	end_date: String!
-	status: String!
+  shares: Float!
+}
+
+input UpdateBookingInput {
+	invoice_id: String
+	start_date: String
+	end_date: String
+	status: String
+  shares: Float
 }
 
 type Mutation {
-	createBooking(payload: BookingInput!): Booking
-	updateBooking(id: ID!, payload: BookingInput!): Booking
+	createBooking(payload: CreateBookingInput!): Booking
+	updateBooking(id: ID!, payload: UpdateBookingInput!): Booking
   updateBookingStatus(id: ID!, status: String!): Booking
 }
