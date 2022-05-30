@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - master
+      - setting-up-ci
 
 jobs:
   publish:
