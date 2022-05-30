@@ -16,7 +16,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
-      - run: cd auth-service   
+      - name: Setup and run tests
+        working-directory: ./packages/auth-service
+        run: |
+          npm install
+          npm run build
+          npm run test
       - run: npm install
       - run: npm run build --if-present
       - name: Deploy to Heroku
