@@ -10,7 +10,6 @@ import { Home } from './entity/home.entity';
 import { LocalityModule } from './locality/locality.module';
 import { HomeModule } from './home/home.module';
 import { LoggerModule } from '@logger/logger.module';
-import { Upload } from '../Scalars/upload.scalar';
 
 import {
   ApolloFederationDriver,

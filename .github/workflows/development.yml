@@ -21,9 +21,12 @@ jobs:
         run: |
           npm install
           npm run build
+<<<<<<< HEAD
           npm run test
       - run: npm install
       - run: npm run build --if-present
+=======
+>>>>>>> master
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
