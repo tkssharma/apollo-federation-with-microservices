@@ -3,7 +3,7 @@ name: Development workflow
 on:
   push:
     branches:
-      - setting-up-ci
+      - develop
 
 jobs:
   deploy:
