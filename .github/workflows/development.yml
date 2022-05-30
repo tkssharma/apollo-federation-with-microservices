@@ -22,7 +22,6 @@ jobs:
           npm install
           npm run build
       - name: Deploy to Heroku
-        working-directory: ./packages/auth-service
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           args: deploy --dir=build --prod
