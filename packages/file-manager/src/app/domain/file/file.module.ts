@@ -5,9 +5,10 @@ import { FileResolver } from './file.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Files } from '../entity/files.entity';
 import { DateScalar } from '@app/scalars/date.scalar';
+import { FilesModule } from '../files/files.module';
 
 @Module({
-  imports: [AuthModule, LoggerModule],
+  imports: [AuthModule, LoggerModule, FilesModule],
   providers: [FileResolver, DateScalar],
 })
 export class FileModule {

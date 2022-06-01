@@ -15,9 +15,6 @@ export class Files extends BaseEntity {
   public id!: string;
 
   @Column({ type: 'uuid' })
-  public user_id!: string;
-
-  @Column({ type: 'uuid' })
   public reference_id!: string;
 
   @Column('varchar', { length: 500, nullable: false })
@@ -29,7 +26,7 @@ export class Files extends BaseEntity {
   @Column('varchar', { length: 500, nullable: false })
   public storage_unique_name!: string;
 
-  @Column('varchar', { length: 500, nullable: false })
+  @Column('varchar', { length: 500, nullable: true })
   public mimetype!: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

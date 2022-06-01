@@ -28,3 +28,16 @@ export class File {
 
   private _banner?: Buffer;
 }
+
+
+@ObjectType()
+export class UploadedFileDto {
+  @Field(() => String)
+  key!: string;
+
+  @Field(() => String)
+  bucket!: string;
+
+  @Field(() => String)
+  url!: string;
+}
