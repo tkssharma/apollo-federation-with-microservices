@@ -13,7 +13,6 @@ export class LoggerMiddleware implements NestMiddleware<Request, Response> {
   public constructor(private logger: Logger) { }
 
   public use(req: RequestLog, res: Response, next: () => void): any {
-    console.log(req.body);
     const before = Date.now();
     const id = req.headers['x-request-id'] ? req.headers['x-request-id'] : uuidv4();
     this.logger.setDefaultMeta(id as string);
@@ -39,7 +38,6 @@ export class LoggerMiddleware implements NestMiddleware<Request, Response> {
    date=${moment().format('DD/MMM/YYYY:HH:mm:ss ZZ')} trace=${id} type=IncomingRequest endpoint=${req.originalUrl} duration=${duration} span=${span} status=${res.statusCode} 
    */
   private generateLogMessage(req: RequestLog, res: Response, timeTaken: number): string {
-    console.log(req)
     const size = this.getResponseSize(res);
     const terms: { [key: string]: string } = {
       '%h': req.socket.remoteAddress || '-',

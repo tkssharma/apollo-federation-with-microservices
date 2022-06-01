@@ -7,6 +7,7 @@ import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { HomeLocality } from '../entity/home-locality.entity';
 import { Home } from '../entity/home.entity';
 import { HomeService } from './home.service';
+import * as fs from 'fs/promises';
 
 @Resolver((of: any) => Home)
 export class HomeResolver {
@@ -32,54 +33,6 @@ export class HomeResolver {
     return await this.homeService.listAllActiveHomes();
   }
 
-  /*
-  ! we are stuck here no solution available 
-curl http://localhost:5002/graphql \
-  -F operations='{ "query": "mutation ($file: Upload!) { uploadHomePhoto(file: $file) { count } }", "variables": { "file": null } }' \
-  -F map='{ "0": ["variables.file"] }' \
-  -F 0=@mocha.png
-
-  {"correlationId":"da2434d3-8690-448e-8548-3117c860bb61","level":"error","message":"[Fri May 27 13:30:52 2022] [error] Missing multipart field ‘operations’ (https://github.com/jaydenseric/graphql-multipart-request-spec)."}
-  */
-  @Mutation()
-  @UseGuards(JwtAuthGuard)
-  async uploadHomePhoto(
-    @Context() context: any
-  ): Promise<{ id: number }> {
-    // try {
-    this.logger.http(context)
-    console.log(context.req.body)
-    /* const { createReadStream } = file;
-     const stream = createReadStream();
-     const chunks: any = [];
-     console.log(stream)
- 
-     const buffer = await new Promise<Buffer>((resolve, reject) => {
-       let buffer: Buffer;
- 
-       stream.on('data', function (chunk) {
-         chunks.push(chunk);
-       });
- 
-       stream.on('end', function () {
-         buffer = Buffer.concat(chunks);
-         resolve(buffer);
-       });
- 
-       stream.on('error', reject);
-     });
-     console.log(buffer);
-     const base64 = buffer.toString('base64');
-     // If you want to store the file, this is one way of doing
-     // it, as you have the file in-memory as Buffer
- 
-     return { id: base64.length }
-   } catch (err) {
-     console.log(err);
-     return { id: 0 };
-   } */
-    return { id: 0 };
-  }
 
   @Query()
   async home(@Args('id') id: string) {

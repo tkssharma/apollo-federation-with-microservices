@@ -82,6 +82,7 @@ const handleAuth = ({ req }) => {
             { name: 'User', url: process.env.AUTH_API },
             { name: 'Home', url: process.env.HOME_MANAGER_API },
             { name: 'Booking', url: process.env.BOOKING_MANAGER_API },
+            { name: 'File', url: process.env.FILE_MANAGER_API },
           ],
         }),
       },
@@ -90,6 +91,6 @@ const handleAuth = ({ req }) => {
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(graphqlUploadExpress()).forRoutes('graphql');
+    //consumer.apply(graphqlUploadExpress()).forRoutes('graphql');
   }
 }

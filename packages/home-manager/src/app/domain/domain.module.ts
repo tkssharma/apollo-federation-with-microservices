@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path';
 import { ConfigModule } from '@app/config/config.module';
 import { DbModule } from '../../db/db.module';
 import { HomeLocality } from './entity/home-locality.entity';
@@ -36,8 +35,8 @@ import { graphqlUploadExpress } from 'graphql-upload';
     ConfigModule,
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
-      uploads: false,
       driver: ApolloFederationDriver,
+      debug: true,
       context: ({ req }: any) => {
         return { req }
       },
@@ -54,6 +53,6 @@ import { graphqlUploadExpress } from 'graphql-upload';
 
 export class DomainModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(graphqlUploadExpress()).forRoutes("graphql");
+    //consumer.apply(graphqlUploadExpress()).forRoutes("graphql");
   }
 }
