@@ -49,8 +49,9 @@ export class FileService {
     throw new NotFoundException();
   }
 
-  async upload(file: any) {
+  async upload(file: any, reference_id: string) {
     try {
+      console.log(file, reference_id);
       const fileUploadResult = [];
       const fileName = `${uuidv4()}-${file.filename}`;
       console.log(file.buffer, fileName, file.filename);
@@ -63,7 +64,7 @@ export class FileService {
       const response: Files = await this.fileDaoService.create(
         {
           name: file.filename,
-          reference_id: uuidv4(),
+          reference_id: reference_id,
           storage_unique_name: fileUploadedResponse.Key,
           url: fileUploadedResponse.url,
           mimetype: file.mimetype

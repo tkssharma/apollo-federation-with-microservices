@@ -27,7 +27,7 @@ import { FilesModule } from './files/files.module';
     AuthModule,
     ConfigModule,
     GraphQLModule.forRoot({
-      autoSchemaFile: 'file.gql',
+      typePaths: ['./**/*.graphql'],
       driver: ApolloFederationDriver,
       debug: true,
       context: ({ req }: any) => {
