@@ -18,7 +18,7 @@
     "start:debug": "nest start --debug --watch",
     "build": "tsc -p tsconfig.build.json",
     "check-engines": "node ../../node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
-    "prebuild": "npm run check-engines && npm run clean",
+    "prebuild": "npm run clean",
     "build:prod": "npm run build",
     "start:prod": "node dist/src/main.js",
     "clean": "rimraf dist",

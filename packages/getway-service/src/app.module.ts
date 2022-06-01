@@ -67,6 +67,7 @@ const handleAuth = ({ req }) => {
         buildService: ({ url }) =>
           new FileUploadDataSource({
             url,
+
             useChunkedTransfer: true,
             willSendRequest({ request, context }: any) {
               request.http.headers.set('userId', context.userId);
@@ -75,11 +76,12 @@ const handleAuth = ({ req }) => {
               request.http.headers.set('permissions', context.permissions);
             },
           }),
+
         supergraphSdl: new IntrospectAndCompose({
           subgraphs: [
-            { name: 'User', url: 'http://localhost:5006/graphql' },
-            { name: 'Home', url: 'http://localhost:5003/graphql' },
-            { name: 'Booking', url: 'http://localhost:5004/graphql' },
+            { name: 'User', url: process.env.AUTH_API },
+            { name: 'Home', url: process.env.HOME_MANAGER_API },
+            { name: 'Booking', url: process.env.BOOKING_MANAGER_API },
           ],
         }),
       },

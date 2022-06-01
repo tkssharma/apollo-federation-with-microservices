@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Home } from '../entity/home.entity';
-import { HomeFacility } from '../entity/home-Facility.entity';
+import { HomeFacility } from '../entity/home-facility.entity';
 import { CreateHomeFacilityDto } from './facility.dto';
 import { Logger } from '@logger/logger';
 

@@ -1,6 +1,6 @@
 import { Resolver, Query, Args, Mutation, Context, ResolveField, Parent, ResolveReference } from '@nestjs/graphql';
 import { Home } from '../entity/home.entity';
-import { HomeFacility } from '../entity/home-Facility.entity';
+import { HomeFacility } from '../entity/home-facility.entity';
 import { HomeFacilityService } from './facility.service';
 import { Logger } from '@logger/logger';
 
