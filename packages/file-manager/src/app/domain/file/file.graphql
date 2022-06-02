@@ -1,0 +1,17 @@
+
+type FileResponse {
+  reference_id: String
+  url: String
+  success: Boolean
+  name: String!
+  mimetype:String
+  id: ID!
+  storage_unique_name: String
+}
+
+type Mutation {
+  uploadFile(id: String!, file: Upload!): FileResponse!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload

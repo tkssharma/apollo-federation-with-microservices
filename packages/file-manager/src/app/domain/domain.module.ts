@@ -3,35 +3,28 @@ import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule } from '@app/config/config.module';
 import { DbModule } from '../../db/db.module';
-import { HomeLocality } from './entity/home-locality.entity';
-import { HomeFacility } from './entity/home-facility.entity';
-import { Home } from './entity/home.entity';
-import { LocalityModule } from './locality/locality.module';
-import { HomeModule } from './home/home.module';
 import { LoggerModule } from '@logger/logger.module';
 
 import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
-import { FacilityModule } from './facility/facility.module';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
-import { FilesModule } from './files/files.module';
 import { AWSS3Module } from '@app/lib/aws-s3';
-import { UserUploads } from './entity/files.entity';
 import { graphqlUploadExpress } from 'graphql-upload';
+import { FileModule } from './file/file.module';
+import { Files } from './entity/files.entity';
+import { AuthModule } from '@app/auth/auth.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
-    DbModule.forRoot({
-      entities: [HomeLocality, HomeFacility, Home, UserUploads]
-    }),
+    DbModule.forRoot({ entities: [Files] }),
+    FilesModule,
     LoggerModule,
     AWSS3Module,
-    HomeModule,
-    FilesModule,
-    LocalityModule,
-    FacilityModule,
+    FileModule,
+    AuthModule,
     ConfigModule,
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
@@ -52,7 +45,4 @@ import { graphqlUploadExpress } from 'graphql-upload';
 })
 
 export class DomainModule {
-  configure(consumer: MiddlewareConsumer) {
-    //consumer.apply(graphqlUploadExpress()).forRoutes("graphql");
-  }
 }

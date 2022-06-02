@@ -9,3 +9,6 @@ services:
   postgres-booking-manager:
     image: postgres:12-alpine
     restart: unless-stopped
+  postgres-file-manager:
+    image: postgres:12-alpine
+    restart: unless-stopped
