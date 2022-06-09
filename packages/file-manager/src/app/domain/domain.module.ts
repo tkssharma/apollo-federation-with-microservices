@@ -13,13 +13,13 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { AWSS3Module } from '@app/lib/aws-s3';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { FileModule } from './file/file.module';
-import { Files } from './entity/files.entity';
+import { File } from './entity/files.entity';
 import { AuthModule } from '@app/auth/auth.module';
 import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
-    DbModule.forRoot({ entities: [Files] }),
+    DbModule.forRoot({ entities: [File] }),
     FilesModule,
     LoggerModule,
     AWSS3Module,

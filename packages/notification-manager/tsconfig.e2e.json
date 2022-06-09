@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@auth/*": ["./src/auth/*"],
+      "@config/*": ["./src/config/*"],
+      "@app/*": ["./src/app/*"],
+      "@core/*": ["./src/app/core/*"],
+      "@shared/*": ["./src/app/shared/*"],
+      "@domain/*": ["./src/app/domain/*"],
+      "@logging/*": ["./src/logging/*"],
+      "@storage/*": ["./src/storage/*"],
+      "@test/*": ["./test/*"]
+    }
+  },
+  "exclude": ["node_modules", "build"]
+}

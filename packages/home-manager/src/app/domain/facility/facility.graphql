@@ -1,11 +1,15 @@
 scalar Date
 
+extend type File @key(fields: "id") {
+  id: ID! @external
+}
+
 type HomeFacility {
 	display_name: String
   name: String
 	description: String
-	display_images: [String!]
-	original_images: [String!]
+	display_images: File!
+	original_images: File!
   id: ID!
   user: User
   created_at: Date

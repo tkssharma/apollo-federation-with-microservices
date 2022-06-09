@@ -13,7 +13,7 @@ import {
   FilterDtoParam,
 } from "./files.dto";
 import FileDaoService from "./file.dao.service";
-import { Files } from "../entity/files.entity";
+import { File } from "../entity/files.entity";
 
 // Code.
 @Injectable()
@@ -23,11 +23,9 @@ export class FileService {
   ) { }
 
 
-  async list(reference_id: string) {
+  async list() {
     try {
-      const files = await this.fileDaoService.getByReferenceIdId(
-        reference_id
-      );
+      const files = await this.fileDaoService.ListAll();
       return files;
     } catch (err) {
       if (err instanceof Error) {
@@ -49,6 +47,32 @@ export class FileService {
     throw new NotFoundException();
   }
 
+
+  async listByReference(reference_id: string) {
+    try {
+      const files = await this.fileDaoService.getByReferenceIdId(
+        reference_id
+      );
+      console.log(files);
+      return files[0];
+    } catch (err) {
+      if (err instanceof Error) {
+        throw err;
+      }
+    }
+  }
+  async getById(id: string) {
+    try {
+      const file = await this.fileDaoService.getByFileId(
+        id
+      );
+      return file;
+    } catch (err) {
+      if (err instanceof Error) {
+        throw err;
+      }
+    }
+  }
   async upload(file: any, reference_id: string) {
     try {
       console.log(file, reference_id);
@@ -61,7 +85,7 @@ export class FileService {
         file.filename
       );
 
-      const response: Files = await this.fileDaoService.create(
+      const response: File = await this.fileDaoService.create(
         {
           name: file.filename,
           reference_id: reference_id,

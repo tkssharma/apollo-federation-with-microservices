@@ -58,6 +58,19 @@ export class HomeResolver {
     return { __typename: 'User', id: home.user_id };
   }
 
+  @ResolveField('display_images')
+  displayImages(@Parent() home: Home) {
+    this.logger.http("ResolveField::file::FileResolver" + home.id)
+    return { __typename: 'File', id: home.id };
+  }
+
+  @ResolveField('original_images')
+  originalImages(@Parent() home: Home) {
+    this.logger.http("ResolveField::file::FileResolver" + home.id)
+    return { __typename: 'File', id: home.id };
+  }
+
+
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {
     this.logger.http('Logging :: ResolveReference :: home')

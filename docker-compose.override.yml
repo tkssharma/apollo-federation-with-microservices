@@ -40,8 +40,19 @@ services:
       - file_manager_api_data:/data/postgres
     ports:
       - 5439:5432
+  postgres-notification-manager:
+    environment:
+      - POSTGRES_USER=api
+      - POSTGRES_PASSWORD=development_pass
+      - POSTGRES_MULTIPLE_DATABASES="notification-manager-api","notification-manager-api-testing"
+    volumes:
+      - ./docker-utils:/docker-entrypoint-initdb.d
+      - notification_manager_api_data:/data/postgres
+    ports:
+      - 5435:5432
 volumes:
   auth_api_data: {}
   home_manager_api_data: {}
   booking_manager_api_data: {}
   file_manager_api_data: {}
+  notification_manager_api_data: {}

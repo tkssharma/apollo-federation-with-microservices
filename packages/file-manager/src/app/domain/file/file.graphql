@@ -8,9 +8,22 @@ type FileResponse {
   id: ID!
   storage_unique_name: String
 }
+type File @key (fields: "id"){
+  reference_id: String
+  url: String
+  name: String
+  mimetype:String
+  id: ID!
+  storage_unique_name: String
+}
+
+type Query {
+   files: [File!]
+   file(id: ID!): File!
+}
 
 type Mutation {
-  uploadFile(id: String!, file: Upload!): FileResponse!
+  uploadFile(id: String!, file: Upload!): [File!]
 }
 
 """The `Upload` scalar type represents a file upload."""

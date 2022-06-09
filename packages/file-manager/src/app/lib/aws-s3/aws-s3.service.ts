@@ -54,21 +54,26 @@ export default class AWSS3Service {
   }
 
   async isPreSignedUrlExpired(url: string) {
-    const parsedUrl = new URL(url);
-    // get access to URLSearchParams object
-    const search_params = parsedUrl.searchParams;
+    try {
+      const parsedUrl = new URL(url);
+      // get access to URLSearchParams object
+      const search_params = parsedUrl.searchParams;
 
-    if (!search_params.has("X-Amz-Expires")) {
-      return true;
+      if (!search_params.has("X-Amz-Expires")) {
+        return true;
+      }
+      const urlGeneratedDate = search_params.get("X-Amz-Date");
+      const parsedGeneratedDate = moment(urlGeneratedDate, "YYYYMMDDTHHmmssZ");
+      const expirationTime = search_params.get("X-Amz-Expires") || "";
+
+      const expirationDate = parsedGeneratedDate.add(
+        parseInt(expirationTime),
+        "seconds"
+      );
+      return moment().isAfter(expirationDate);
+    } catch (err) {
+      console.log(err)
+      throw err;
     }
-    const urlGeneratedDate = search_params.get("X-Amz-Date");
-    const parsedGeneratedDate = moment(urlGeneratedDate, "YYYYMMDDTHHmmssZ");
-    const expirationTime = search_params.get("X-Amz-Expires") || "";
-
-    const expirationDate = parsedGeneratedDate.add(
-      parseInt(expirationTime),
-      "seconds"
-    );
-    return moment().isAfter(expirationDate);
   }
 }

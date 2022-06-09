@@ -3,18 +3,18 @@ import { Logger } from "@logger/logger";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Files } from "../entity/files.entity";
+import { File } from "../entity/Files.entity";
 
 @Injectable()
 export default class FileDaoService {
   constructor(
-    @InjectRepository(Files) private readonly userUploadRepo: Repository<Files>,
+    @InjectRepository(File) private readonly userUploadRepo: Repository<File>,
     private readonly logger: Logger,
     private readonly s3: AWSS3Service
 
   ) { }
 
-  async create(payload: Partial<Files>): Promise<Files> {
+  async create(payload: Partial<File>): Promise<File> {
     try {
       return await this.userUploadRepo.save(payload)
     } catch (err) {
@@ -37,7 +37,7 @@ export default class FileDaoService {
 
   async getByFileId(
     fileId: string
-  ): Promise<Files | undefined> {
+  ): Promise<File | undefined> {
     const file = await this.userUploadRepo.findOne({ where: { id: fileId } })
 
     if (file) {
@@ -58,12 +58,13 @@ export default class FileDaoService {
     }
   }
 
-  async getByReferenceIdId(referenceId: string): Promise<Files[]> {
-    const files = await this.userUploadRepo.find({ where: { reference_id: referenceId } })
+  async ListAll(): Promise<File[]> {
+    const storedFile = [];
+    const File = await this.userUploadRepo.find({ where: {} })
 
-    for (const file of files) {
+
+    for (const file of File) {
       const fileUrlExpired = await this.s3.isPreSignedUrlExpired(file.url);
-
       if (fileUrlExpired) {
         const newUrl = await this.s3.getPresignedUrl(
           file.storage_unique_name,
@@ -71,13 +72,33 @@ export default class FileDaoService {
         );
         file.url = newUrl;
         const updatedFile = await this.userUploadRepo.save(file);
-        files.push(updatedFile);
+        storedFile.push(updatedFile);
       } else {
-        files.push(file);
+        storedFile.push(file);
       }
     }
 
-    return files;
+    return storedFile;
   }
 
+  async getByReferenceIdId(referenceId: string): Promise<File[]> {
+    const storedFile = [];
+    const File = await this.userUploadRepo.find({ where: { reference_id: referenceId } })
+
+    for (const file of File) {
+      const fileUrlExpired = await this.s3.isPreSignedUrlExpired(file.url);
+      if (fileUrlExpired) {
+        const newUrl = await this.s3.getPresignedUrl(
+          file.storage_unique_name,
+          file.name
+        );
+        file.url = newUrl;
+        const updatedFile = await this.userUploadRepo.save(file);
+        storedFile.push(updatedFile);
+      } else {
+        storedFile.push(file);
+      }
+    }
+    return storedFile;
+  }
 }

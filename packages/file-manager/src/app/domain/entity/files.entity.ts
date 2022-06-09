@@ -10,7 +10,7 @@ import {
 
 
 @Entity({ name: 'files' })
-export class Files extends BaseEntity {
+export class File extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 

@@ -1,0 +1,41 @@
+  /*
+  working example ::
+  curl --location --request POST 'http://localhost:5009/graphql' \
+--form 'operations="{\"query\": \"mutation uploadFile($file: Upload!) {  uploadFile(file: $file)} \", \"variables\": {\"file\": null}}"' \
+--form 'map="{\"0\": [\"variables.file\"]}"' \
+--form '0=@"./mocha.jpg"'
+
+curl --location --request POST 'http://localhost:5009/graphql' \
+--form 'operations="{\"query\": \"mutation uploadFile($file: Upload!) {  uploadFile(file: $file){key bucket url}} \", \"variables\": {\"file\": null}}"' \
+--form 'map="{\"0\": [\"variables.file\"]}"' \
+--form '0=@"./mocha.jpg"'
+
+
+ curl --location --request POST 'http://localhost:5009/graphql' \
+--form 'operations="{\"query\": \"mutation uploadFile($id: String,$file: Upload!) {  uploadFile(id: $id, file: $file){id}} \", \"variables\": {\"file\": null}}"' \
+--form 'map="{\"0\": [\"variables.file\"]}"' \
+--form 'map="{\"1\": [\"variables.id\"]}"' \
+--form '0=@"./mocha.jpg"'
+--form '1=@"d23d24dc-e1f1-11ec-8fea-0242ac120002"'
+
+
+
+curl --location --request POST 'http://localhost:5009/graphql' \
+--form 'operations="{\"query\": \"mutation uploadFile($id: String!, $file: Upload!) {  uploadFile(id: $id, file: $file){id}} \", \"variables\": {\"file\": null, \"id\": \"d23d24dc-e1f1-11ec-8fea-0242ac120002\"}}"' \
+--form 'map="{\"0\": [\"variables.file\"]}"' \
+--form 'map="{\"1\": [\"variables.id\"]}"' \
+--form '0=@"./mocha.jpg"'
+--form '1=@"d23d24dc-e1f1-11ec-8fea-0242ac120002"'
+
+
+curl --location --request POST 'http://localhost:5009/graphql' \
+-H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxNjMyZWE2MC02MzcwLTRlMDMtYTBlMy1lOGFlM2ZlZjYyYjgiLCJlbWFpbCI6ImFkbWluLmFkbWluQGdtYWlsLmNvbSIsInBlcm1pc3Npb25zIjpbImFkbWluIl0sImV4cGlyYXRpb24iOiIyMDIyLTA2LTEwVDAzOjUyOjI2LjEwNFoiLCJpYXQiOjE2NTQ1NjUxNDYsImV4cCI6MTY1NDgzMzE0Nn0.DJZQ8svrd6HgChzdw0IVNTpXpzPCSZaAoleLwaWfX9I' \
+--form 'operations="{\"query\": \"mutation uploadFile($id: String!, $file: Upload!) {  uploadFile(id: $id, file: $file){    reference_id url success name mimetype id storage_unique_name}} \", \"variables\": {\"file\": null, \"id\": \"d23d24dc-e1f1-11ec-8fea-0242ac120002\"}}"' \
+--form 'map="{\"0\": [\"variables.file\"]}"' \
+--form 'map="{\"1\": [\"variables.id\"]}"' \
+--form '0=@"./mocha.jpg"'
+--form '1=@"d23d24dc-e1f1-11ec-8fea-0242ac120002"'
+
+{"data":{"uploadFile":{"reference_id":"d23d24dc-e1f1-11ec-8fea-0242ac120002","url":"https://atlas-fractional-home-ownership.s3.amazonaws.com/14be3111-d172-44b0-9914-888f924e9c4d-mocha.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAZGLBBDEH7JMRHCWI%2F20220607%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220607T032344Z&X-Amz-Expires=604800&X-Amz-Signature=9ec650cac2727bcb9ab0b840be9c6dff1dab5689fe583460cfe96fa79ae85bc6&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%20%3D%22mocha.jpg%22","success":true,"name":"mocha.jpg","mimetype":null,"id":"94f199bc-38da-406d-88b9-ec62a64b159f","storage_unique_name":"14be3111-d172-44b0-9914-888f924e9c4d-mocha.jpg"}}}
+
+*/
