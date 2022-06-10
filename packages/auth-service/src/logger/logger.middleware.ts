@@ -8,6 +8,7 @@ export interface RequestLog extends Request {
   parentSpan?: string | string[];
   span?: string | string[];
   payload: any;
+  authorization: string;
 }
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware<Request, Response> {
