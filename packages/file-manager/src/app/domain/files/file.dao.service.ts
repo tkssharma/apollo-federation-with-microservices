@@ -3,7 +3,7 @@ import { Logger } from "@logger/logger";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { File } from "../entity/Files.entity";
+import { File } from "../entity/files.entity";
 
 @Injectable()
 export default class FileDaoService {

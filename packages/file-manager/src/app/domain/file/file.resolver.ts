@@ -1,4 +1,4 @@
-import { Args, Int, Mutation, Query, Resolver, ResolveReference } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, ResolveProperty, Resolver, ResolveReference } from '@nestjs/graphql';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import * as fs from 'fs/promises';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
@@ -50,6 +50,13 @@ export class FileResolver {
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {
     return await this.fileService.listByReference(reference.id)
+  }
+
+  @ResolveProperty()
+  async FileList(reference: { __typename: string; id: string }) {
+    const data = await this.fileService.listByReferenceId(reference.id);
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    return { idRef: reference.id, files: data }
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)

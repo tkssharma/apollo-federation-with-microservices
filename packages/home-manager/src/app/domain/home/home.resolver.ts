@@ -57,6 +57,20 @@ export class HomeResolver {
     this.logger.http("ResolveField::user::HomeResolver" + home.user_id)
     return { __typename: 'User', id: home.user_id };
   }
+  /*
+  @ResolveField('display_images')
+  displayImages(@Parent() home: Home) {
+    this.logger.http("ResolveField::display_images::FileResolver" + home.id)
+    //return { __typename: "FileList", idRef: home.id }
+    return { __typename: "File", idRef: home.id }
+  }
+
+  @ResolveField('original_images')
+  originalImages(@Parent() home: Home) {
+    this.logger.http("ResolveField::original_images::FileResolver" + home.id)
+    // return { __typename: "FileList", idRef: home.id }
+    return { __typename: "File", idRef: home.id }
+  } */
 
   @ResolveField('display_images')
   displayImages(@Parent() home: Home) {
@@ -69,7 +83,6 @@ export class HomeResolver {
     this.logger.http("ResolveField::file::FileResolver" + home.id)
     return { __typename: 'File', id: home.id };
   }
-
 
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {

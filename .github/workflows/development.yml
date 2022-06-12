@@ -1,4 +1,4 @@
-name: Development workflow
+name: checking workflow
 
 on:
   push:
@@ -10,21 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Development Code
+      - name: checkout
         uses: actions/checkout@v2
       - name: Use Node.js 14.x
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
       - name: Setup and run tests
-        working-directory: ./packages/auth-service
         run: |
           npm install
           npm run build
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          args: deploy --dir=build --prod
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "testing-app"
-          heroku_email: "testing@gmail.com"

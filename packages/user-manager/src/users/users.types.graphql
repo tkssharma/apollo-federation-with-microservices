@@ -1,0 +1,65 @@
+scalar Date
+
+extend type File @key(fields: "id") {
+  id: ID! @external
+}
+
+
+type Query {
+  users: [User!]!
+  userById(id: ID!): User!
+  findUsers(input: FindUserInput!): [User!]
+  userByEmail(email: String!): User!
+  forgotPassword(email: String): Boolean
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput): User!
+  updateUserByEmail(fieldsToUpdate: UpdateUserInput!, email: String): User!
+  updateUserById(fieldsToUpdate: UpdateUserInput!, id: ID): User!
+  updateOwnProfile(fieldsToUpdate: UpdateUserInput!): User!
+  addAdminPermission(email: String!): User!
+  removeAdminPermission(email: String!): User!
+  resetPassword(email: String!, code: String!, password: String!): User!
+}
+
+type User @key (fields: "id"){
+  id: ID!
+  email: String!
+  permissions: [String!]!
+  first_name: String
+  last_name: String
+  name: String
+  picture_url: File!
+  created_at: Date!
+  updated_at: Date!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  first_name: String!
+  last_name: String!
+  name: String
+}
+
+input UpdateUserInput {
+  password: UpdatePasswordInput
+  enabled: Boolean
+  name: String
+  email: String
+  first_name: String
+  last_name: String
+}
+
+input FindUserInput {
+  name: String
+  email: String
+  first_name: String
+  last_name: String
+}
+
+input UpdatePasswordInput {
+  oldPassword: String!
+  newPassword: String!
+}

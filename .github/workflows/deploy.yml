@@ -1,0 +1,53 @@
+name: deployment
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: User Manager
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: "5992c5df-ffae-4334-bb73-95546606362a"
+          heroku_app_name: "user-manager-api-dev"
+          heroku_email: "tarun.softengg@gmail.com"
+          appdir: "packages/user-manager"
+      - name: Home Manager
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: "5992c5df-ffae-4334-bb73-95546606362a"
+          heroku_app_name: "home-manager-api-dev"
+          heroku_email: "tarun.softengg@gmail.com"
+          appdir: "packages/home-manager"
+
+      - name: Booking Manager
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: "5992c5df-ffae-4334-bb73-95546606362a"
+          heroku_app_name: "booking-manager-api-dev"
+          heroku_email: "tarun.softengg@gmail.com"
+          appdir: "packages/booking-manager"
+      - name: File Manager
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: "5992c5df-ffae-4334-bb73-95546606362a"
+          heroku_app_name: "file-manager-api-dev"
+          heroku_email: "tarun.softengg@gmail.com"
+          appdir: "packages/file-manager"
+
+      - name: Gateway Manager
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: "5992c5df-ffae-4334-bb73-95546606362a"
+          heroku_app_name: "gateway-api-dev"
+          heroku_email: "tarun.softengg@gmail.com"
+          appdir: "packages/gateway-manager"
+      - name: Notification Manager
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: "5992c5df-ffae-4334-bb73-95546606362a"
+          heroku_app_name: "notification-manager-api-dev"
+          heroku_email: "tarun.softengg@gmail.com"
+          appdir: "packages/notification-manager"

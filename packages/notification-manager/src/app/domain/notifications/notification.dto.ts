@@ -1,9 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDefined,
+  IsEnum,
   IsOptional, IsUUID
 } from 'class-validator';
 
+export enum TemplateType {
+  'USER_PASSWORD_RESET_NOTIFICATION' = 'USER_PASSWORD_RESET_NOTIFICATION',
+  'USER_SIGNUP_NOTIFICATION' = 'USER_SIGNUP_NOTIFICATION',
+  'HOME_CREATED_NOTIFICATION' = 'HOME_CREATED_NOTIFICATION'
+}
 export class NotificationPayload {
 
   @ApiProperty({
@@ -34,19 +40,23 @@ export class NotificationPayload {
   @ApiProperty({
     description: 'template data to be send in email template',
     required: false,
-    example: {}
+    example: {
+      recipient_name: 'okay',
+      recipient_email: 'okay@gmail.com'
+    }
   })
   @IsDefined()
-  public template_data?: object;
+  public template_data?: any;
 
 
   @ApiProperty({
     description: 'type of email template like Invite, welcome invite, promotions etc',
     required: true,
-    example: 'Signup email notification'
+    enum: TemplateType,
+    example: 'USER_SIGNUP_NOTIFICATION'
   })
-  @IsDefined()
-  public template_type?: string;
+  @IsEnum(TemplateType)
+  public template_type?: TemplateType;
 
 }
 

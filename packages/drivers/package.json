@@ -7,11 +7,11 @@
   "scripts": {
     "build": "tsc",
     "check-engines": "node ../../node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
+    "test": "echo 'we will start adding tests'",
     "clean": "rimraf build && rimraf coverage",
     "prebuild": "npm run clean && npm run check-engines",
     "prepublishOnly": "npm run build",
     "pretest": "npm run build",
-    "test": "npm run test:ci",
     "test:ci": "jest --ci --collectCoverage --maxWorkers 2 --passWithNoTests"
   },
   "engines": {

@@ -38,12 +38,78 @@ export default class NotificationHandlerService {
         case 'USER_SIGNUP_NOTIFICATION':
           return await this.sendUserSignupEmail(user, payload);
           break;
+        case 'USER_PASSWORD_RESET_NOTIFICATION':
+          return await this.userPasswordReset(user, payload);
+          break;
+        case 'HOME_CREATED_NOTIFICATION':
+          return await this.userPasswordReset(user, payload);
+          break;
         default:
           return null;
           break;
 
       }
     } catch (err) { }
+  }
+  private async userPasswordReset(user: UserMetaData, data: NotificationPayload) {
+    try {
+      this.logger.log(JSON.stringify(data));
+      const { template_type } = data;
+      this.logger.log(`processing [platform service] ${template_type}`);
+
+      const notificationId = await this.notificationDaoService.create({
+        uuid: uuidv4(),
+        name: template_type,
+        type: 'email',
+        external_id: data.external_id || uuidv4(),
+        recipient_email: data.recipient_email,
+        recipient_name: data.recipient_name,
+        template_data: JSON.stringify(data.template_data || {}),
+        template_type: data.template_type,
+        status: Status.pending
+      })
+
+      const info = await this.sendgridService.sendEmail(this.buildEmailPayload(data, template_type));
+      await this.notificationDaoService.updateStatus(notificationId, {
+        status: Status.processed,
+      });
+      return info;
+
+    } catch (error) {
+      this.rollbarLogger.error(error, 'EventHandlerService -> userPasswordReset');
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  private async homeCreatedNotification(user: UserMetaData, data: NotificationPayload) {
+    try {
+      const { template_type } = data;
+      this.logger.log(`processing [platform service] ${template_type}`);
+
+      const notificationId = await this.notificationDaoService.create({
+        uuid: uuidv4(),
+        name: template_type,
+        type: 'email',
+        external_id: data.external_id || uuidv4(),
+        recipient_email: data.recipient_email,
+        recipient_name: data.recipient_name,
+        template_data: JSON.stringify(data.template_data || {}),
+        template_type: data.template_type,
+        status: Status.pending
+      })
+
+      const info = await this.sendgridService.sendEmail(this.buildEmailPayload(data, template_type));
+      await this.notificationDaoService.updateStatus(notificationId, {
+        status: Status.processed,
+      });
+      return info;
+
+    } catch (error) {
+      this.rollbarLogger.error(error, 'EventHandlerService -> homeCreatedNotification');
+      this.logger.error(error);
+      throw error;
+    }
   }
   private async sendUserSignupEmail(user: UserMetaData, data: NotificationPayload) {
     try {
@@ -69,7 +135,7 @@ export default class NotificationHandlerService {
       return info;
 
     } catch (error) {
-      this.rollbarLogger.error(error, 'EventHandlerService -> handleAllEmailEvents');
+      this.rollbarLogger.error(error, 'EventHandlerService -> sendUserSignupEmail');
       this.logger.error(error);
       throw error;
     }
@@ -83,8 +149,9 @@ export default class NotificationHandlerService {
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const htmlTemplate = handlebars.compile(source);
     const templateData = {
-      recipient_name: data.recipient_name,
-      recipient_email: data.recipient_email
+      recipient_name: data.template_data?.recipient_name,
+      recipient_email: data.template_data?.recipient_email,
+      token: data.template_data?.token
     };
     const htmlToSend = htmlTemplate(templateData);
 

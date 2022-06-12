@@ -23,7 +23,10 @@ jobs:
           npm set @xcanchal:registry=https://npm.pkg.github.com/xcanchal
           npm set "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Install dependencies
+      - name: Install dependencies and tests
         run: | # Install and link dependencies
           npm ci
           npx lerna bootstrap
+          npm run lint
+          npm run build
+          npm run test

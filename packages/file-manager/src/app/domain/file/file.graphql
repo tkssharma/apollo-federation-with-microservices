@@ -8,6 +8,13 @@ type FileResponse {
   id: ID!
   storage_unique_name: String
 }
+
+type FileList @key(fields: "idRef"){
+  idRef: ID!
+  files: [File!]
+}
+
+
 type File @key (fields: "id"){
   reference_id: String
   url: String

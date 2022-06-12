@@ -9,39 +9,54 @@ import {
   SendEmailInput,
 } from "./types";
 import { ConfigService } from "@config/config.service";
+import { throwError } from "rxjs";
+import { Logger } from "@logging/logger/logger";
 // Code.
 @Injectable()
 export class SendgridService {
 
   transporter: nodemailer.Transporter;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly logger: Logger
+  ) {
   }
 
   initTransporter() {
-    this.transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      auth: {
-        user: process.env.SENDGRID_USER,
-        pass: process.env.SENDGRID_PASSWORD,
-      },
-      logger: true
-    });
+    try {
+      this.transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+          user: process.env.SENDGRID_USER,
+          pass: process.env.SENDGRID_PASSWORD,
+        },
+        logger: true
+      });
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
   }
 
   async sendEmail(input: SendEmailInput): Promise<ClientResponse> {
-    this.initTransporter();
-    const info = await this.transporter.sendMail({
-      from: input.from,
-      to: input.to,
-      subject: input.subject,
-      text: input.text,
-      html: input.html,
-    });
-
-    return info;
+    try {
+      this.initTransporter();
+      const info = await this.transporter.sendMail({
+        from: input.from,
+        to: input.to,
+        subject: input.subject,
+        text: input.text,
+        html: input.html,
+      });
+      return info;
+    }
+    catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
   }
 }

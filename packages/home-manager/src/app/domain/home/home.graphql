@@ -1,10 +1,6 @@
 scalar Date
 scalar Upload
 
-extend type File @key(fields: "id") {
-  id: ID! @external
-}
-
 type Home @key (fields: "id"){
     id: ID!
     name: String!
@@ -17,6 +13,14 @@ type Home @key (fields: "id"){
     is_active: Boolean!
     created_at: Date
     updated_at: Date
+}
+
+extend type FileList @key(fields:"idRef"){
+  idRef: ID! @external
+}
+
+extend type File @key(fields:"id"){
+  id: ID! @external
 }
 
 extend type User @key(fields: "id") {

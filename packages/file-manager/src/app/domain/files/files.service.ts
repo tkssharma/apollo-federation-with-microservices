@@ -61,6 +61,19 @@ export class FileService {
       }
     }
   }
+  async listByReferenceId(reference_id: string) {
+    try {
+      const files = await this.fileDaoService.getByReferenceIdId(
+        reference_id
+      );
+      console.log(files);
+      return files[0];
+    } catch (err) {
+      if (err instanceof Error) {
+        throw err;
+      }
+    }
+  }
   async getById(id: string) {
     try {
       const file = await this.fileDaoService.getByFileId(
