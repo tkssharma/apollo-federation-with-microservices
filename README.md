@@ -4,7 +4,8 @@
 #### example diagram to talk about gateway and other micro services
 ![](https://romankudryashov.com/blog/2020/12/graphql-rust/images/architecture.png)
 
-
+Atlas Fractional
+================
 Lerna monorepo that holds common platform code and all packages
 
 ## Getting Started
@@ -29,26 +30,60 @@ This platform contains all these components
 - Home Manager service
 - Gateway Service
 - Home Manager Service
+- File Manager Service
+- Notification Manager
 
 ### Running all these services 
 
 > we are using docker-compose to bootstrap all container only (database containers)
 > in the root of the project run
 ```
-docker-compose up
-```
-> check the longs and make sure databases has been created 
-```
 git clone https://github.com/MobileLeapLabs/atlas-fractional.git
 cd atlas-fractional
-cd packages
+docker-compose up
+
+➜  atlas-fractional git:(intergrations-and-notifications) docker-compose up
+atlas-fractional_postgres-notification-manager_1 is up-to-date
+atlas-fractional_postgres-auth_1 is up-to-date
+atlas-fractional_postgres-home-manager_1 is up-to-date
+atlas-fractional_postgres-file-manager_1 is up-to-date
+atlas-fractional_postgres-booking-manager_1 is up-to-date
+Attaching to atlas-fractional_postgres-notification-manager_1, atlas-fractional_postgres-auth_1, atlas-fractional_postgres-home-manager_1, atlas-fractional_postgres-file-manager_1, atlas-fractional_postgres-booking-manager_1
 ```
+
+Note:  make sure docker-utils script should have 777 permission on local to get executed 
+> check the logs and make sure databases has been created 
+
+```
+as example ::
+postgres-notification-manager_1  | server started
+postgres-notification-manager_1  | CREATE DATABASE
+postgres-notification-manager_1  |
+postgres-notification-manager_1  |
+postgres-notification-manager_1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/postgres-database.sh
+postgres-notification-manager_1  | Multiple database creation requested: "notification-manager-api","notification-manager-api-testing"
+postgres-notification-manager_1  |   Creating user and database '"notification-manager-api"'
+postgres-notification-manager_1  | CREATE ROLE
+postgres-notification-manager_1  | CREATE DATABASE
+postgres-notification-manager_1  | GRANT
+postgres-notification-manager_1  |   Creating user and database '"notification-manager-api-testing"'
+postgres-notification-manager_1  | CREATE ROLE
+postgres-notification-manager_1  | CREATE DATABASE
+postgres-notification-manager_1  | GRANT
+postgres-notification-manager_1  | Multiple databases created
+
+```
+
+All services follow same pattern for running locally, now we just need to populate .env and run `npm run start:dev` command 
+
 ### Running Auth service
 
 ```sh
 cd auth-service
 vi .env
 ```
+Note: You cna take reference from Heroku App setting to know any missing env variables
+
 update env with this content 
 ```
 DATABASE_URL= postgres://api:development_pass@localhost:5431/auth-api
@@ -60,6 +95,7 @@ PORT=5006
 NODE_ENV=local
 JWT_SECRET=HELLODEMO
 JWT_EXPIRE_IN=3600*24
+NOTIFICATION_API_URL=https://notification-manager-api-dev.herokuapp.com/api/v1
 ```
 Now run application in watch mode it will be live on localhost:5006 
 ```sh
@@ -81,6 +117,9 @@ PORT=5003
 SECRET_KEY=HELLODEMO
 NEW_RELIC_KEY=
 DATABASE_URL=postgres://api:development_pass@localhost:5433/home-manager-api
+NODE_ENV=local
+JWT_SECRET=HELLODEMO
+JWT_EXPIRE_IN=3600*24
 ```
 Now run application in watch mode it will be live on localhost:5003 
 ```sh
@@ -102,7 +141,61 @@ JWT_SECRET=HELLODEMO
 JWT_EXPIRE_IN=3600*24
 DATABASE_URL=postgres://api:development_pass@localhost:5434/booking-manager-api
 ```
-Now run application in watch mode it will be live on localhost:5003 
+Now run application in watch mode it will be live on localhost:5004
+```sh
+npm run start:dev
+```
+
+### Running File Manager
+
+```sh
+cd file-manager
+vi .env
+```
+update env with this content 
+```
+NODE_ENV=local
+LOG_LEVEL=http
+PORT=5009
+DATABASE_URL=postgres://api:development_pass@localhost:5439/file-manager-api
+NODE_ENV=local
+JWT_SECRET=HELLODEMO
+JWT_EXPIRE_IN=3600*24
+AWS_BUCKET_NAME=atlas-fractional-home-ownership
+AWS_ACCESS_KEY=AKIAZGLBBDEH7JMRHCWI
+AWS_SECRET_ACCESS=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
+AWS_REGION=us-east-1
+```
+Now run application in watch mode it will be live on localhost:5009
+```sh
+npm run start:dev
+```
+
+
+### Running Notification Manager
+
+```sh
+cd notification-manager
+vi .env
+```
+update env with this content 
+```
+NODE_ENV=local
+PORT=3010
+AUTH_PROVIDER=auth0
+AUTH_SECRET=HELLODEMO
+DATABASE_URL= postgres://api:development_pass@localhost:5435/notification-manager-api
+ROLLBAR_TOKEN=
+NEW_RELIC_LICENSE_KEY=
+LOG_LEVEL=http
+SWAGGER_USERNAME=money-moves
+SWAGGER_PASSWORD=money-moves
+SENDGRID_USER=hello
+SENDGRID_PASSWORD=hello
+
+
+```
+Now run application in watch mode it will be live on localhost:5010
 ```sh
 npm run start:dev
 ```
@@ -117,10 +210,14 @@ vi .env
 update env with this content 
 ```
 NODE_ENV=local
-LOG_LEVEL=http
+LOG_LEVEL=info
 PORT=5002
 NEW_RELIC_KEY=
 SECRET_KEY=HELLODEMO
+HOME_MANAGER_API=http://localhost:5003/graphql
+AUTH_API=http://localhost:5006/graphql
+BOOKING_MANAGER_API=http://localhost:5004/graphql
+FILE_MANAGER_API=http://localhost:5009/graphql
 ```
 Now run application in watch mode it will be live on localhost:5002 
 ```sh
@@ -130,7 +227,6 @@ Once all services are up we can use gateway service to connect with all apis
 ```sh
 http://localhost:5002/graphql
 ```
-
 
 ## Helpful command for Lerna
 
